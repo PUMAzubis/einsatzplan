@@ -11,7 +11,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="350.0" prefWidth="460.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="350.0" prefWidth="460.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.dpma.pumaz.control.RootController">
    <children>
       <TabPane layoutX="21.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
@@ -20,17 +20,17 @@
               <AnchorPane prefHeight="311.0" prefWidth="458.0">
                      <children>
                         <TextField layoutX="25.0" layoutY="33.0" promptText="Name(n)" />
-                        <ComboBox layoutX="25.0" layoutY="82.0" prefHeight="31.0" prefWidth="187.0" promptText="Ausbildungsberuf" />
-                        <ComboBox layoutX="25.0" layoutY="125.0" prefHeight="31.0" prefWidth="187.0" promptText="Ausbildungsjahr" />
-                        <ComboBox layoutX="25.0" layoutY="171.0" prefHeight="31.0" prefWidth="187.0" promptText="Einsatzplanjahr" />
+                        <ComboBox fx:id="comboboxBeruf" layoutX="25.0" layoutY="82.0" prefHeight="31.0" prefWidth="187.0" promptText="Ausbildungsberuf" />
+                        <ComboBox fx:id="comboboxAusbildung" layoutX="25.0" layoutY="125.0" prefHeight="31.0" prefWidth="187.0" promptText="Ausbildungsjahr" />
                         <ButtonBar layoutX="9.0" layoutY="243.0" prefHeight="40.0" prefWidth="421.0">
                           <buttons>
                               <Button mnemonicParsing="false" prefHeight="31.0" text="Generieren" />
                             <Button mnemonicParsing="false" text="Export" />
                               <Button mnemonicParsing="false" text="Import" />
-                              <Button mnemonicParsing="false" text="Abbrechen" />
+                              <Button mnemonicParsing="false" onAction="#handleExit" text="Abbrechen" />
                           </buttons>
                         </ButtonBar>
+                        <ComboBox fx:id="comboboxEinsatzjahr" layoutX="25.0" layoutY="181.0" prefHeight="31.0" prefWidth="187.0" promptText="Einsatzplanjahr" />
                      </children>
                   </AnchorPane>
             </content>

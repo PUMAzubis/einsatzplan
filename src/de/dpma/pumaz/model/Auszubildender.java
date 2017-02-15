@@ -2,7 +2,6 @@ package de.dpma.pumaz.model;
 
 import java.time.LocalDate;
 
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 
@@ -10,7 +9,7 @@ public class Auszubildender {
 
 	private final StringProperty vorname = null;
     private final StringProperty nachname = null;
-    private final IntegerProperty ausbildungsjahr = null;
+    private int ausbildungsjahr = 0;
     private final ObjectProperty<LocalDate> einsatzplanjahr = null;
     
     public String getVorname() {
@@ -48,18 +47,15 @@ public class Auszubildender {
     public ObjectProperty<LocalDate> einsatzplanjahrProperty() {
         return einsatzplanjahr;
     }
+
+	public int getAusbildungsjahr() {
+		return ausbildungsjahr;
+	}
+	
+	public void setAusbildungsjahr(int ausbildungsjahr) {
+        this.ausbildungsjahr = ausbildungsjahr;
+    }
     
-    public Integer getAusbildungsjahr() {
-        return ausbildungsjahr.get();
-    }
-
-    public void setAusbildungsjahr(Integer ausbildungsjahr) {
-        this.ausbildungsjahr.set(ausbildungsjahr);
-    }
-
-    public IntegerProperty ausbildungsjahrProperty() {
-        return ausbildungsjahr;
-    }
     
     
 }

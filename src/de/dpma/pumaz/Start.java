@@ -2,20 +2,15 @@ package de.dpma.pumaz;
 
 import java.io.IOException;
 
-import de.dpma.pumaz.model.Auszubildender;
+import de.dpma.pumaz.control.RootController;
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 public class Start extends Application{
-	/**
-     * The data as an observable list of Persons.
-     */
-    private ObservableList<Auszubildender> personData = FXCollections.observableArrayList();
+
 	private Stage primaryStage;
 	private AnchorPane rootLayout;
 
@@ -42,6 +37,8 @@ public class Start extends Application{
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(Start.class.getResource("view/RootLayout.fxml"));
 			rootLayout = (AnchorPane) loader.load();
+			
+			RootController rootC = loader.getController();
 			
 			//Show the scene containing the root layout.
 			Scene scene = new Scene(rootLayout);
