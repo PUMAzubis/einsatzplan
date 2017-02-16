@@ -1,12 +1,22 @@
 package de.dpma.pumaz.control;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import de.dpma.pumaz.model.Termin;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class RootController {
 	
@@ -16,9 +26,21 @@ public class RootController {
 	private ComboBox<Integer> comboboxAusbildung;
 	@FXML
 	private ComboBox <Integer> comboboxEinsatzjahr;
+	@FXML
+    private TextField nameField;
+	@FXML
+	private TableView<Termin> terminTable;
+	@FXML
+	private TableColumn<Termin, String> terminNameColumn;
+	@FXML
+	private TableColumn<Termin, LocalDate> terminVonColumn;
+	@FXML
+	private TableColumn<Termin, LocalDate> terminBisColumn;
 	List<String> ausbildungsberuf = Arrays.asList("Fachinformatiker", "INKA", "VFA", "KFB", "FAMI", "Schreiner", "Elektroniker");
 	List<Integer> ausbildungsjahre = Arrays.asList(1, 2, 3, 4);
 	List<Integer> einsatzplanjahre = new ArrayList<Integer>();
+	
+	private Stage dialogStage;
 	
 	@FXML
 	public void initialize(){
@@ -27,6 +49,15 @@ public class RootController {
 		comboboxEinsatzjahr.getItems().addAll(einsatzplanjahre);
 		comboboxAusbildung.getItems().addAll(ausbildungsjahre);
 	}
+	
+    /**
+     * Sets the stage of this dialog.
+     * 
+     * @param dialogStage
+     */
+    public void setDialogStage(Stage dialogStage) {
+        this.dialogStage = dialogStage;
+    }
 	
 	public void setEinsatzjahre(){
 		int i, j = 0, k = -5;
@@ -40,12 +71,33 @@ public class RootController {
 				einsatzplanjahre.add(j, LocalDate.now().getYear());
 			}
 		}
-		
-		
-		
-		
 	}
-
+	
+	@FXML
+	public void handleNewEntry(){
+		System.out.println("KNOOOOOOOOOOPF");
+		try {
+	        // Load the fxml file and create a new stage for the popup dialog.
+	        FXMLLoader loader = new FXMLLoader();
+	        loader.setLocation(getClass().getResource("../view/TerminEditDialog.fxml"));
+	        AnchorPane page = (AnchorPane) loader.load();
+	        
+	        // Create the dialog Stage.
+	        dialogStage = new Stage();
+	        dialogStage.setTitle("Neuer Eintrag");
+	        dialogStage.initModality(Modality.WINDOW_MODAL);
+	        Scene scene = new Scene(page);
+	        dialogStage.setScene(scene);
+	        
+	        TerminEditController controller = loader.getController();
+	        controller.setDialogStage(dialogStage);
+	        
+	        dialogStage.show();
+	        
+		} catch (IOException e) {
+	        e.printStackTrace();  
+	    }
+	}
 
     /**
      * Closes the application.

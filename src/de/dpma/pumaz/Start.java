@@ -35,7 +35,7 @@ public class Start extends Application{
 		try{
 			//Load root layout from fxml file.
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(Start.class.getResource("view/RootLayout.fxml"));
+			loader.setLocation(getClass().getResource("view/RootLayout.fxml"));
 			rootLayout = (AnchorPane) loader.load();
 			
 			RootController rootC = loader.getController();
