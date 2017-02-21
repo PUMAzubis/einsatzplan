@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import de.dpma.pumaz.StartApp;
 import de.dpma.pumaz.model.Termin;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -33,17 +34,25 @@ public class RootController {
 	@FXML
 	private TableColumn<Termin, String> terminNameColumn;
 	@FXML
-	private TableColumn<Termin, LocalDate> terminVonColumn;
+	private TableColumn<Termin, String> terminVonColumn;
 	@FXML
-	private TableColumn<Termin, LocalDate> terminBisColumn;
+	private TableColumn<Termin, String> terminBisColumn;
 	List<String> ausbildungsberuf = Arrays.asList("Fachinformatiker", "INKA", "VFA", "KFB", "FAMI", "Schreiner", "Elektroniker");
 	List<Integer> ausbildungsjahre = Arrays.asList(1, 2, 3, 4);
 	List<Integer> einsatzplanjahre = new ArrayList<Integer>();
 	
 	private Stage dialogStage;
+    // Reference to the main application.
+    private StartApp startApp;
 	
 	@FXML
 	public void initialize(){
+		  // Initialize the person table with the two columns.
+		terminTable.setVisible(true);
+        terminNameColumn.setCellValueFactory(cellData -> cellData.getValue().terminNameProperty());
+        terminVonColumn.setCellValueFactory(cellData -> cellData.getValue().startDatumNameProperty());
+        terminBisColumn.setCellValueFactory(cellData -> cellData.getValue().endDatumNameProperty());
+
 		setEinsatzjahre();
 		comboboxBeruf.getItems().addAll(ausbildungsberuf);
 		comboboxEinsatzjahr.getItems().addAll(einsatzplanjahre);
@@ -62,7 +71,6 @@ public class RootController {
 	public void setEinsatzjahre(){
 		int i, j = 0, k = -5;
 		for(i = (LocalDate.now().minusYears(5).getYear()); i < LocalDate.now().plusYears(5).getYear(); i++, j++, k++){
-			System.out.println(i + " ter Durchgang");
 			if((LocalDate.now().minusYears(5).getYear()) < LocalDate.now().getYear() ){
 				einsatzplanjahre.add(j, (LocalDate.now().minusYears(k).getYear()));
 			}else if(LocalDate.now().getYear() < LocalDate.now().plusYears(5).getYear()){
@@ -72,6 +80,18 @@ public class RootController {
 			}
 		}
 	}
+	
+    /**
+     * Is called by the main application to give a reference back to itself.
+     * 
+     * @param mainApp
+     */
+    public void setStart(StartApp startApp) {
+        this.startApp = startApp;
+
+        // Add observable list data to the table
+        terminTable.setItems(startApp.getTerminList());
+    }
 	
 	@FXML
 	public void handleNewEntry(){
@@ -92,11 +112,22 @@ public class RootController {
 	        TerminEditController controller = loader.getController();
 	        controller.setDialogStage(dialogStage);
 	        
-	        dialogStage.show();
+	        dialogStage.showAndWait();
 	        
 		} catch (IOException e) {
 	        e.printStackTrace();  
 	    }
+	}
+	
+	/**
+	 * Löscht einen Termin
+	 */
+	@FXML
+	private void handleDeleteTermin(){
+		System.out.println(this + "  handleDeleteTermin");
+		Termin termin = terminTable.getSelectionModel().getSelectedItem();
+		int index = terminTable.getSelectionModel().getSelectedIndex();
+		StartApp.removeTermin(index);
 	}
 
     /**

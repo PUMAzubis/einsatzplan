@@ -42,7 +42,7 @@
                         <ButtonBar layoutX="14.0" layoutY="235.0" prefHeight="40.0" prefWidth="256.0">
                           <buttons>
                             <Button mnemonicParsing="false" onAction="#handleNewEntry" text="Neuer Eintrag" />
-                              <Button mnemonicParsing="false" prefHeight="31.0" text="Löschen" />
+                              <Button mnemonicParsing="false" onAction="#handleDeleteTermin" prefHeight="31.0" text="Löschen" />
                           </buttons>
                         </ButtonBar>
                         <ScrollPane layoutX="36.0" layoutY="25.0" prefHeight="200.0" prefWidth="399.0">

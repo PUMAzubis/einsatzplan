@@ -11,15 +11,16 @@
    <children>
       <Label layoutX="33.0" layoutY="30.0" text="Terminname" />
       <TextField fx:id="terminNameField" layoutX="33.0" layoutY="51.0" prefHeight="31.0" prefWidth="166.0" />
-      <DatePicker layoutX="33.0" layoutY="106.0" prefHeight="31.0" prefWidth="130.0" promptText="Von" />
-      <DatePicker layoutX="197.0" layoutY="106.0" prefHeight="31.0" prefWidth="130.0" promptText="Bis" />
+      <DatePicker fx:id="datePickerVon" layoutX="33.0" layoutY="106.0" prefHeight="31.0" prefWidth="130.0" promptText="Von" />
+      <DatePicker fx:id="datePickerBis" layoutX="197.0" layoutY="106.0" prefHeight="31.0" prefWidth="130.0" promptText="Bis" />
       <DatePicker layoutX="33.0" layoutY="145.0" prefHeight="31.0" prefWidth="130.0" promptText="Von" />
       <DatePicker layoutX="197.0" layoutY="145.0" prefHeight="31.0" prefWidth="130.0" promptText="Bis" />
       <ButtonBar layoutX="14.0" layoutY="218.0" prefHeight="40.0" prefWidth="316.0">
         <buttons>
-          <Button mnemonicParsing="false" text="Übernehmen" />
+          <Button mnemonicParsing="false" onAction="#handleSubmit" text="Übernehmen" />
             <Button minWidth="0.0" mnemonicParsing="false" onAction="#handleExit" prefHeight="31.0" prefWidth="169.0" text="Abbrechen" />
         </buttons>
       </ButtonBar>
+      <Button layoutX="343.0" layoutY="106.0" mnemonicParsing="false" text="Plus" />
    </children>
 </AnchorPane>
