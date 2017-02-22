@@ -32,10 +32,18 @@ public class StartApp extends Application{
 		terminList.add(new Termin("Kindergarten", LocalDate.of(2012, 12, 20), LocalDate.of(2013, 2, 12)));
 	}
 	
+	/**
+	 * Fügt der Terminliste einen Termin hinzu.
+	 * @param termin
+	 */
 	public static void addTermin(Termin termin){
 		terminList.add(termin);
 	}
 	
+	/**
+	 * Löscht aus der Liste an der Stelle des Übergabeparameter @index den Eintrag hinaus.
+	 * @param index
+	 */
 	public static void removeTermin(int index){
 		terminList.remove(index);
 	}
@@ -60,7 +68,6 @@ public class StartApp extends Application{
 	 * Initializes the root layout.
 	 * 
 	 */
-	
 	public void initRootLayout(){
 		try{
 			//Load root layout from fxml file.

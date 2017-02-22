@@ -19,7 +19,7 @@ public class TerminEditController {
 	private Stage stage;
 	
     /**
-     * Initializes the controller class. This method is automatically called
+     * Initialisiert die Controller-Klasse. This method is automatically called
      * after the fxml file has been loaded.
      */
     @FXML
@@ -27,7 +27,7 @@ public class TerminEditController {
     }
 	
     /**
-     * Sets the stage of this dialog.
+     * Setze den Status des Dialogs.
      * 
      * @param dialogStage
      */
@@ -48,7 +48,7 @@ public class TerminEditController {
     }
 
     /**
-     * Schließt die Anwendung
+     * Schließt das Dialogfenster.
      */
     @FXML
     private void handleExit() {

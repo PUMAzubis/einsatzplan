@@ -11,6 +11,7 @@ import de.dpma.pumaz.model.Termin;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -45,6 +46,10 @@ public class RootController {
     // Reference to the main application.
     private StartApp startApp;
 	
+    /**
+     * Initialisiert die Controller-Klasse. This method is automatically called
+     * after the fxml file has been loaded.
+     */
 	@FXML
 	public void initialize(){
 		  // Initialize the person table with the two columns.
@@ -68,6 +73,9 @@ public class RootController {
         this.dialogStage = dialogStage;
     }
 	
+    /**
+     * Setzt die Einsatzplanjahre in die Combobox. Immer -5 bis +5 Jahre des heutigen Jahres.
+     */
 	public void setEinsatzjahre(){
 		int i, j = 0, k = -5;
 		for(i = (LocalDate.now().minusYears(5).getYear()); i < LocalDate.now().plusYears(5).getYear(); i++, j++, k++){
@@ -93,9 +101,11 @@ public class RootController {
         terminTable.setItems(startApp.getTerminList());
     }
 	
+    /**
+     * Öffnet ein neues Fenster, in welchem man Termine anlegen kann.
+     */
 	@FXML
 	public void handleNewEntry(){
-		System.out.println("KNOOOOOOOOOOPF");
 		try {
 	        // Load the fxml file and create a new stage for the popup dialog.
 	        FXMLLoader loader = new FXMLLoader();
@@ -120,7 +130,7 @@ public class RootController {
 	}
 	
 	/**
-	 * Löscht einen Termin
+	 * Löscht bei Auswahl einer Zeile einen Termin aus der Liste.
 	 */
 	@FXML
 	private void handleDeleteTermin(){
@@ -131,7 +141,7 @@ public class RootController {
 	}
 
     /**
-     * Closes the application.
+     * Schließt die gesamte Anwendung.
      */
     @FXML
     private void handleExit() {
