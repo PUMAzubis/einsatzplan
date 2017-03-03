@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import de.dpma.pumaz.util.DateUtil;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.paint.Color;
 
 public class Termin {
 
@@ -13,6 +14,7 @@ public class Termin {
 	private ObjectProperty<String> endDatumName = new SimpleObjectProperty<String>();
 	private ObjectProperty<LocalDate> startDatum = null;
 	private ObjectProperty<LocalDate> endDatum = null;
+	private ObjectProperty<Color> farbe = new SimpleObjectProperty<Color>();
 	
 	public Termin(){
 		this(null);
@@ -20,28 +22,28 @@ public class Termin {
 	
 	public Termin(String terminName){
 		this.terminName = new SimpleObjectProperty<String>(terminName);
-//		this.startDatum = new SimpleObjectProperty<LocalDate>(LocalDate.of(2012, 2, 21));
-//		this.endDatum = new SimpleObjectProperty<LocalDate>(LocalDate.of(2016, 2, 21));
 		setStartDatumName(LocalDate.of(2012, 2, 21));
 		setEndDatumName(LocalDate.of(2014, 11, 1));
-		System.out.println(this + " " + getStartDatumName());
-		System.out.println(this + " " + getEndDatumName());
 		this.startDatumName = startDatumNameProperty();
 		this.endDatumName = endDatumNameProperty();
 	}
 	
 	public Termin(String terminName, LocalDate localDate1, LocalDate localdate2){
-//		setTerminName(terminName);
-//		System.out.println(getTerminName());
-//		this.terminName = terminNameProperty();
 		this.terminName = new SimpleObjectProperty<String>(terminName);
-		System.out.println(getTerminName());
 		setStartDatumName(localDate1);
-		System.out.println(getStartDatumName());
 		this.startDatumName = startDatumNameProperty();
 		setEndDatumName(localdate2);
-		System.out.println(getEndDatumName());
-		this.endDatumName = endDatumNameProperty();		
+		this.endDatumName = endDatumNameProperty();
+	}
+	
+	public Termin(String terminName, LocalDate localDate1, LocalDate localdate2, Color color){
+		this.terminName = new SimpleObjectProperty<String>(terminName);
+		setStartDatumName(localDate1);
+		this.startDatumName = startDatumNameProperty();
+		setEndDatumName(localdate2);
+		this.endDatumName = endDatumNameProperty();
+		setFarbe(color);
+		this.farbe = colorProperty();
 	}
 
 	public String getTerminName(){
@@ -102,6 +104,18 @@ public class Termin {
 	
 	public String getEndDatumName(){
 		return endDatumName.get();
+	}
+	
+	public ObjectProperty<Color> colorProperty(){
+		return farbe;
+	}
+
+	public Color getFarbe() {
+		return farbe.get();
+	}
+
+	public void setFarbe(Color farbe) {
+		this.farbe.set(farbe);
 	}
     
 }

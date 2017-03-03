@@ -39,20 +39,25 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <ButtonBar layoutX="14.0" layoutY="235.0" prefHeight="40.0" prefWidth="256.0" AnchorPane.bottomAnchor="25.0">
+                        <ButtonBar layoutX="15.0" layoutY="235.0" prefHeight="40.0" prefWidth="394.0" AnchorPane.bottomAnchor="25.0">
                           <buttons>
                             <Button mnemonicParsing="false" onAction="#handleNewEntry" text="Neuer Eintrag" />
+                              <Button mnemonicParsing="false" onAction="#handleEditTermin" text="Bearbeiten" />
                               <Button mnemonicParsing="false" onAction="#handleDeleteTermin" prefHeight="31.0" text="Löschen" />
                           </buttons>
                         </ButtonBar>
                         <ScrollPane layoutX="36.0" layoutY="25.0">
                           <content>
-                              <TableView fx:id="terminTable" prefHeight="200.0">
+                              <TableView fx:id="terminTable" prefHeight="200.0" prefWidth="400.0">
                                 <columns>
-                                  <TableColumn fx:id="terminNameColumn" prefWidth="134.0" text="Termine" />
-                                  <TableColumn fx:id="terminVonColumn" prefWidth="134.0" text="Von" />
-                                    <TableColumn fx:id="terminBisColumn" prefWidth="111.0" text="Bis" />
+                                  <TableColumn fx:id="terminNameColumn" prefWidth="-1.0" text="Termine" />
+                                  <TableColumn fx:id="terminVonColumn" prefWidth="-1.0" text="Von" />
+                                    <TableColumn fx:id="terminBisColumn" prefWidth="-1.0" text="Bis" />
+                                    <TableColumn fx:id="colorColumn" prefWidth="-1.0" text="Farbe" />
                                 </columns>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
                               </TableView>
                           </content>
                         </ScrollPane>

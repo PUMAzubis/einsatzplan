@@ -41,6 +41,15 @@ public class StartApp extends Application{
 	}
 	
 	/**
+	 * Ersetzt den Termin, der an dieser Stelle steht.
+	 * @param termin
+	 */
+	public static void replaceTermin(Termin termin, int index){
+		terminList.remove(index);
+		terminList.add(index, termin);
+	}
+	
+	/**
 	 * Löscht aus der Liste an der Stelle des Übergabeparameter @index den Eintrag hinaus.
 	 * @param index
 	 */

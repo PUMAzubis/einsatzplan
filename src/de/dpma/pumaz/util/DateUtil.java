@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-import javafx.beans.property.StringProperty;
-
 /**
  * Helper functions for handling dates.
  * 
