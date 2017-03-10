@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 
 public class Termin {
 
+	private int termin_id;
 	private ObjectProperty<String> terminName = new SimpleObjectProperty<String>();
 	private ObjectProperty<String> startDatumName = new SimpleObjectProperty<String>();
 	private ObjectProperty<String> endDatumName = new SimpleObjectProperty<String>();
@@ -116,6 +117,14 @@ public class Termin {
 
 	public void setFarbe(Color farbe) {
 		this.farbe.set(farbe);
+	}
+
+	public int getTermin_id() {
+		return termin_id;
+	}
+
+	public void setTermin_id(int termin_id) {
+		this.termin_id = termin_id;
 	}
     
 }

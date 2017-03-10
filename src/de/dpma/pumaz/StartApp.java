@@ -64,6 +64,13 @@ public class StartApp extends Application{
     public ObservableList<Termin> getTerminList() {
         return terminList;
     }
+    
+    public static boolean isEmpty(){
+    	if(terminList.isEmpty()){
+    		return true;
+    	}
+    	return false;
+    }
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {

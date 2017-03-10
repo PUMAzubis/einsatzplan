@@ -23,7 +23,7 @@ public class TerminEditController {
 	@FXML
 	private ColorPicker colorPicker = new ColorPicker(Color.ALICEBLUE);
 	
-	private int index;
+	private int index = -1;
 	private Stage stage;
 	
     /**
@@ -60,6 +60,7 @@ public class TerminEditController {
 	    		stage.close();
 	    	}
     	}else{
+    		System.out.println(this + " " + index);
     		StartApp.replaceTermin(new Termin(terminNameField.getText(), datePickerVon.getValue(), datePickerBis.getValue(), colorPicker.getValue()), index);
     		stage.close();
     	} 
@@ -70,6 +71,7 @@ public class TerminEditController {
     		System.out.println("Kein Objekt von Termin: ");
     	}else{
     		this.index = index;
+    		System.out.println(this + " " + index);
     		terminNameField.setText(termin.getTerminName());
     		datePickerVon.setValue(DateUtil.parse(termin.getStartDatumName()));
     		datePickerBis.setValue(DateUtil.parse(termin.getEndDatumName()));
