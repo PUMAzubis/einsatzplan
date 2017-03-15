@@ -13,8 +13,8 @@ public class Termin {
 	private ObjectProperty<String> terminName = new SimpleObjectProperty<String>();
 	private ObjectProperty<String> startDatumName = new SimpleObjectProperty<String>();
 	private ObjectProperty<String> endDatumName = new SimpleObjectProperty<String>();
-	private ObjectProperty<LocalDate> startDatum = null;
-	private ObjectProperty<LocalDate> endDatum = null;
+	private ObjectProperty<LocalDate> startDatum = new SimpleObjectProperty<LocalDate>();
+	private ObjectProperty<LocalDate> endDatum = new SimpleObjectProperty<LocalDate>();
 	private ObjectProperty<Color> farbe = new SimpleObjectProperty<Color>();
 	
 	public Termin(){
@@ -47,6 +47,9 @@ public class Termin {
 		this.farbe = colorProperty();
 	}
 
+	/***************************************************************************************
+	 * Getter für den Terminnamen
+	 */
 	public String getTerminName(){
 		return terminName.get();
 	}
@@ -59,30 +62,24 @@ public class Termin {
 		return terminName;
 	}
 	
+	/***************************************************************************************
+     * Methoden, um den Startwert als ObjectProperty<LocalDate> zu setzen
+     */
 	public LocalDate getStartDatum() {
         return startDatum.get();
     }
 
-    public void setStartDatum(LocalDate startDatum) {
-        this.startDatum.set(startDatum);
+    public void setStartDatum(String startString) {
+        this.startDatum.set((DateUtil.parse(startString)));
     }
-
+    
     public ObjectProperty<LocalDate> startDatumProperty() {
         return startDatum;
     }
     
-    public LocalDate getEndDatum() {
-        return endDatum.get();
-    }
-
-    public void setEndDatum(LocalDate endDatum) {
-        this.endDatum.set(endDatum);
-    }
-
-    public ObjectProperty<LocalDate> endDatumProperty() {
-        return endDatum;
-    }
-
+	/***************************************************************************************
+     * Methoden, um den Startwert als ObjectProperty<String> zu setzen
+     */
 	public ObjectProperty<String> startDatumNameProperty() {
 		return startDatumName;
 	}
@@ -94,8 +91,26 @@ public class Termin {
 	public void setStartDatumName(LocalDate startDatumName) {
 		this.startDatumName.set((DateUtil.format(startDatumName)));
 	}
+    
+	/***************************************************************************************
+     * Methoden, um den Endwert als ObjectProperty<LocalDate> zu setzen
+     */
+    public LocalDate getEndDatum() {
+        return endDatum.get();
+    }
 
-	public ObjectProperty<String> endDatumNameProperty() {
+    public void setEndDatum(String endString) {
+        this.endDatum.set((DateUtil.parse(endString)));
+    }
+
+    public ObjectProperty<LocalDate> endDatumProperty() {
+        return endDatum;
+    }
+    
+	/***************************************************************************************
+     * Methoden, um den Startwert als ObjectProperty<String> zu setzen
+     */
+    public ObjectProperty<String> endDatumNameProperty() {
 		return endDatumName;
 	}
 
@@ -107,6 +122,9 @@ public class Termin {
 		return endDatumName.get();
 	}
 	
+	/***************************************************************************************
+     * Methoden, um die Farbe als ObjectProperty<Color> zu setzen
+     */
 	public ObjectProperty<Color> colorProperty(){
 		return farbe;
 	}

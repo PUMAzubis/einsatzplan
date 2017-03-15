@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.dpma.pumaz.StartApp;
+import de.dpma.pumaz.dao.TerminConn;
 import de.dpma.pumaz.model.Termin;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -42,13 +43,13 @@ public class RootController {
 	private TableColumn<Termin, String> terminBisColumn;
 	@FXML 
 	private TableColumn<Termin, Color> colorColumn;
+	
 	List<String> ausbildungsberuf = Arrays.asList("Fachinformatiker", "INKA", "VFA", "KFB", "FAMI", "Schreiner", "Elektroniker");
 	List<Integer> ausbildungsjahre = Arrays.asList(1, 2, 3, 4);
 	List<Integer> einsatzplanjahre = new ArrayList<Integer>();
 	
 	private Stage dialogStage;
     // Reference to the main application.
-    @SuppressWarnings("unused")
 	private StartApp startApp;
     private TerminEditController controller;
 	
@@ -115,6 +116,47 @@ public class RootController {
         // Add observable list data to the table
         terminTable.setItems(startApp.getTerminList());
     }
+    
+    /**
+     * Speichert die Einträge der Tabelle in der Datenbank
+     */
+    @FXML
+    public void saveTable(){
+    	TerminConn tc = startApp.getTerminConn();
+    	
+//    	tc.establishConnection();
+    	for (Termin termin : startApp.getList()) {
+    		String str = termin.getStartDatumName();
+    		String str2 = termin.getEndDatumName();
+    		termin.setStartDatum(str);
+    		termin.getStartDatum();
+    		termin.setEndDatum(str2);
+    		termin.getEndDatum();
+			tc.insertTermin(termin.getTerminName(), termin.getStartDatum(), termin.getEndDatum(), termin.getFarbe().toString());
+		}
+
+    }
+    
+    
+	/**
+	 * 
+	 */
+    @FXML
+    public void loadTable(){
+    	TerminConn tc = startApp.getTerminConn();
+    	
+//    	tc.establishConnection();
+    	for (Termin termin : startApp.getList()) {
+    		String str = termin.getStartDatumName();
+    		String str2 = termin.getEndDatumName();
+    		termin.setStartDatum(str);
+    		termin.getStartDatum();
+    		termin.setEndDatum(str2);
+    		termin.getEndDatum();
+			tc.insertTermin(termin.getTerminName(), termin.getStartDatum(), termin.getEndDatum(), termin.getFarbe().toString());
+		}
+    }
+
 	
     /**
      * Öffnet ein neues Fenster, in welchem man Termine anlegen kann.
@@ -202,6 +244,8 @@ public class RootController {
      */
     @FXML
     private void handleExit() {
+    	TerminConn tc = startApp.getTerminConn();
+    	tc.closeConnection(tc.getConnection());
         System.exit(0);
     }
 }

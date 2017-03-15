@@ -50,16 +50,17 @@ public class TerminConnection {
 		Statement s;
 		PreparedStatement psInsert;
 		ResultSet resultSet;
+		String mainTable = "Termin";
 		String printLine = "  __________________________________________________";
-		String createString = "CREATE TABLE TERMIN  " + "(TERMIN_ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)"
-				+ "   CONSTRAINT TERMIN_PK PRIMARY KEY, "
+		String createString = "CREATE TABLE " + mainTable + " (TERMIN_ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)"
+				+ "   CONSTRAINT Termin_PK PRIMARY KEY, "
 				+ " TERMINNAME VARCHAR(32) NOT NULL, STARTDATUM DATE, ENDDATUM DATE, COLOR VARCHAR(255)) ";
 //		ENTRY_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-		String insertString ="INSERT INTO TERMIN(TERMINNAME, STARTDATUM, ENDDATUM, COLOR) values (?, ? , ?, ?)";
-		String searchByString = "select TERMINNAME, STARTDATUM, ENDDATUM, COLOR from TERMIN order by TERMINNAME";
+		String insertString ="INSERT INTO " + mainTable + " (TERMINNAME, STARTDATUM, ENDDATUM, COLOR) values (?, ? , ?, ?)";
+		String searchByString = "select TERMINNAME, STARTDATUM, ENDDATUM, COLOR from " + mainTable + " order by TERMINNAME";
+		String deleteString = "DROP TABLE " + mainTable;
 		Date date = Date.valueOf(localD);
 		Date date2 = Date.valueOf(localD2);
-		String sColor = color.toString();
 		// JDBC code sections
 		// Beginning of Primary DB access section
 		// ## BOOT DATABASE SECTION ##
@@ -74,12 +75,12 @@ public class TerminConnection {
 			s = conn.createStatement();
 			
 			// Call utility method to check if table exists.
-			if(!doesTableExist(conn, "Termin")){ // soll false sein
+			if(doesTableExist(conn, mainTable)){ // soll false sein
 				System.err.println("Tabelle existiert nicht??");
 				psInsert = conn.prepareStatement(createString);
 				psInsert.execute();
 				System.err.println("Tabelle exisitiert doch");
-			}		
+			}
 			
 			// Prepare the insert statement to use
 			psInsert = conn.prepareStatement(insertString);
@@ -90,10 +91,10 @@ public class TerminConnection {
 					psInsert.setString(1, terminname);
 					psInsert.setDate(2, date);
 					psInsert.setDate(3, date2);
-					psInsert.setString(4, sColor);
+					psInsert.setString(4, color);
 					psInsert.executeUpdate();
 
-					// Select all records in the WISH_LIST table
+				// Select all records in the TERMIN table
 					resultSet = s.executeQuery(searchByString);
 					
 					// Loop through the ResultSet and print the data
@@ -104,6 +105,11 @@ public class TerminConnection {
 					System.out.println(printLine);
 					// Close the resultSet
 					resultSet.close();
+					
+//					System.err.println("Tabelle " + mainTable + " wird versucht zu löschen.");
+//					psInsert = conn.prepareStatement(deleteString);
+//					psInsert.execute();
+//					System.err.println("Tabelle " + mainTable + " gelöscht.");
 				} // END of IF block
 				// Check if it is time to EXIT, if so end the loop
 			// Release the resources (clean up )
@@ -148,15 +154,19 @@ public class TerminConnection {
 	public static boolean doesTableExist (Connection conn, String tablename) throws SQLException{
 		try(ResultSet resSet = conn.getMetaData().getTables(null, null, tablename, null)) {
 			while(resSet.next()){
-				String table = resSet.getString("Termin");
+				System.out.println(resSet.next());
+				String table = resSet.getString("TERMIN");
 				System.out.println(table);
 				if(table.toLowerCase().equals(tablename.toLowerCase())){
+					System.out.println("Tabellenname ist " + table);
 					return true;
 				}
 			}
 		} catch (SQLException e) {
+			System.err.println("SQLException in doesTableExist");
 			e.printStackTrace();
 		}
+		System.err.println("doesTableExist wirft false");
 		return false;
 	}
 }

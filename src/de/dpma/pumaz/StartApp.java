@@ -1,9 +1,10 @@
 package de.dpma.pumaz;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.sql.Connection;
 
 import de.dpma.pumaz.control.RootController;
+import de.dpma.pumaz.dao.TerminConn;
 import de.dpma.pumaz.model.Termin;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -17,6 +18,7 @@ public class StartApp extends Application{
 
 	private Stage primaryStage;
 	private AnchorPane rootLayout;
+	private TerminConn terminConn = new TerminConn();
 	public static RootController rootController;
 	
 	private static ObservableList<Termin> terminList = FXCollections.observableArrayList();
@@ -27,9 +29,13 @@ public class StartApp extends Application{
 	
 	public StartApp(){
 
-		terminList.add(new Termin("Berufsschule"));
-		terminList.add(new Termin("Gesundheitstag"));
-		terminList.add(new Termin("Kindergarten", LocalDate.of(2012, 12, 20), LocalDate.of(2013, 2, 12)));
+//		terminList.add(new Termin("Berufsschule"));
+//		terminList.add(new Termin("Gesundheitstag"));
+//		terminList.add(new Termin("Kindergarten", LocalDate.of(2012, 12, 20), LocalDate.of(2013, 2, 12)));
+	}
+	
+	public TerminConn getTerminConn(){
+		return terminConn;
 	}
 	
 	/**
@@ -57,6 +63,20 @@ public class StartApp extends Application{
 		terminList.remove(index);
 	}
 	
+	/**
+	 * 
+	 */
+	public static void getFirstIndex(){
+		terminList.get(0);
+	}
+	
+	/**
+	 * 
+	 */
+	public ObservableList<Termin> getList(){
+		return terminList;
+	}
+	
     /**
      * Returns the data as an observable list of Termin. 
      * @return
@@ -76,6 +96,7 @@ public class StartApp extends Application{
 	public void start(Stage primaryStage) throws Exception {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("Einsatzplan");
+		terminConn.establishConnection();
 		
 		initRootLayout();
 	}
