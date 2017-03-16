@@ -36,33 +36,38 @@ import java.sql.Statement;
 import java.time.LocalDate;
 
 import de.dpma.pumaz.StartApp;
+import de.dpma.pumaz.model.Termin;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.paint.Color;
 
 public class TerminConn {
 
 	// ## DEFINE VARIABLES SECTION ##
 	// define the driver to use
-	String driver = "org.apache.derby.jdbc.EmbeddedDriver";
+	private String driver = "org.apache.derby.jdbc.EmbeddedDriver";
 	// the database name
-	String dbName = "testDB";
+	private String dbName = "testDB";
 	// String dbName = "terminDB";
 	// define the Derby connection URL to use
-	String connectionURL = "jdbc:derby:" + dbName + ";create=true";
-	Connection conn = null;
-	Statement s;
-	PreparedStatement psInsert;
-	ResultSet resultSet;
-	String mainTable = "Termin";
-	String printLine = "  __________________________________________________";
-	String createString = "CREATE TABLE " + mainTable
+	private String connectionURL = "jdbc:derby:" + dbName + ";create=true";
+	private Connection conn = null;
+	private Statement s;
+	private PreparedStatement psInsert;
+	private ResultSet resultSet;
+	private String mainTable = "Termin";
+	private String printLine = "  __________________________________________________";
+	private String createString = "CREATE TABLE " + mainTable
 			+ " (TERMIN_ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)"
 			+ "   CONSTRAINT Termin_PK PRIMARY KEY, "
 			+ " TERMINNAME VARCHAR(32) NOT NULL, STARTDATUM DATE, ENDDATUM DATE, COLOR VARCHAR(255)) ";
-	// ENTRY_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-	String insertString = "INSERT INTO " + mainTable
+	private String insertString = "INSERT INTO " + mainTable
 			+ " (TERMINNAME, STARTDATUM, ENDDATUM, COLOR) values (?, ? , ?, ?)";
-	String searchByString = "select TERMINNAME, STARTDATUM, ENDDATUM, COLOR from " + mainTable + " order by TERMINNAME";
-	String deleteString = "DROP TABLE " + mainTable;
-	StartApp startApp;
+	
+	private String searchByString = "select TERMINNAME, STARTDATUM, ENDDATUM, COLOR from " + mainTable + " order by TERMINNAME";
+	private String deleteString = "DROP TABLE " + mainTable;
+	private String countString = "SELECT COUNT(*) FROM TERMIN";
+	private StartApp startApp;
 
 	public Connection establishConnection() {
 		try {
@@ -89,8 +94,8 @@ public class TerminConn {
 	}
 
 	public void insertTermin(String terminname, LocalDate localD, LocalDate localD2, String color) {
-		Date date = Date.valueOf(localD);
-		Date date2 = Date.valueOf(localD2);
+		Date dateStart = Date.valueOf(localD);
+		Date dateEnd = Date.valueOf(localD2);
 		// JDBC code sections
 		// Beginning of Primary DB access section
 		// ## BOOT DATABASE SECTION ##
@@ -111,8 +116,8 @@ public class TerminConn {
 			if (!terminname.equals("")) {
 				// Insert the text entered into the WISH_ITEM table
 				psInsert.setString(1, terminname);
-				psInsert.setDate(2, date);
-				psInsert.setDate(3, date2);
+				psInsert.setDate(2, dateStart);
+				psInsert.setDate(3, dateEnd);
 				psInsert.setString(4, color);
 				psInsert.executeUpdate();
 
@@ -128,6 +133,7 @@ public class TerminConn {
 				}
 				System.out.println(printLine);
 				// Close the resultSet
+				// Release the resources (clean up )
 				resultSet.close();
 				psInsert.close();
 				s.close();
@@ -170,10 +176,8 @@ public class TerminConn {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		System.out.println("Closed connection");
 	}
-	// Release the resources (clean up )
 
 	public static boolean doesTableExist(Connection conn, String tablename) throws SQLException {
 		try (ResultSet resSet = conn.getMetaData().getTables(null, null, tablename, null)) {
@@ -192,5 +196,54 @@ public class TerminConn {
 		}
 		System.err.println("doesTableExist wirft false");
 		return false;
+	}
+	
+	/**
+	 * Liest die Information eines Termins aus der Datenbank aus und gibt ihn zurück.
+	 * @return termin
+	 */
+	public ObservableList<Termin> getDBTermin(){
+		ObservableList<Termin> list = FXCollections.observableArrayList();
+		list = startApp.getTerminList();
+		try {
+			
+			s = conn.createStatement();
+			// Select all records in the TERMIN table
+			resultSet = s.executeQuery(searchByString);
+
+			// Loop through the ResultSet and print the data
+			while (resultSet.next()) {
+				String s = resultSet.getString(4);
+				Color color = Color.web(s);
+				Termin termin = new Termin(resultSet.getString(1),resultSet.getDate(2).toLocalDate(), resultSet.getDate(3).toLocalDate(),  color); 
+				StartApp.addTermin(termin);
+			}
+			resultSet.close();
+			s.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return list;
+	}
+	
+	public int anzahlTermin(){
+		int rowCount = 0;
+		try {
+			s = conn.createStatement();
+			resultSet = s.executeQuery(countString);
+			resultSet.next();
+			rowCount = resultSet.getInt(1);
+			System.out.println("anzahlTermine " + rowCount);
+			s.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return rowCount;
+	}
+	
+	public void setApp(StartApp startApp){
+		this.startApp = startApp;
 	}
 }

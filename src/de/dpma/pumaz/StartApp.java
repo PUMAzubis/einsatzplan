@@ -1,7 +1,6 @@
 package de.dpma.pumaz;
 
 import java.io.IOException;
-import java.sql.Connection;
 
 import de.dpma.pumaz.control.RootController;
 import de.dpma.pumaz.dao.TerminConn;
@@ -70,13 +69,6 @@ public class StartApp extends Application{
 		terminList.get(0);
 	}
 	
-	/**
-	 * 
-	 */
-	public ObservableList<Termin> getList(){
-		return terminList;
-	}
-	
     /**
      * Returns the data as an observable list of Termin. 
      * @return
@@ -97,7 +89,7 @@ public class StartApp extends Application{
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("Einsatzplan");
 		terminConn.establishConnection();
-		
+		terminConn.setApp(this);
 		initRootLayout();
 	}
 	
@@ -131,6 +123,11 @@ public class StartApp extends Application{
 	 */
 	public Stage getPrimaryStage(){
 		return primaryStage;
+	}
+	
+	@Override
+	public void stop(){
+    	terminConn.closeConnection(terminConn.getConnection());
 	}
 
 }

@@ -118,14 +118,14 @@ public class RootController {
     }
     
     /**
-     * Speichert die Einträge der Tabelle in der Datenbank
+     * Speichert die Einträge der Tabelle in der Datenbank.
      */
     @FXML
     public void saveTable(){
     	TerminConn tc = startApp.getTerminConn();
     	
 //    	tc.establishConnection();
-    	for (Termin termin : startApp.getList()) {
+    	for (Termin termin : startApp.getTerminList()) {
     		String str = termin.getStartDatumName();
     		String str2 = termin.getEndDatumName();
     		termin.setStartDatum(str);
@@ -134,27 +134,18 @@ public class RootController {
     		termin.getEndDatum();
 			tc.insertTermin(termin.getTerminName(), termin.getStartDatum(), termin.getEndDatum(), termin.getFarbe().toString());
 		}
-
+    	
+    	tc.anzahlTermin();
     }
     
-    
 	/**
-	 * 
+	 * Beim Klicken des Knopfes werden die Termine aus der Tabelle in eine ArrayList gespeichert. Diese wird direkt in die 
+	 * Tabelle übernommen.
 	 */
     @FXML
     public void loadTable(){
     	TerminConn tc = startApp.getTerminConn();
-    	
-//    	tc.establishConnection();
-    	for (Termin termin : startApp.getList()) {
-    		String str = termin.getStartDatumName();
-    		String str2 = termin.getEndDatumName();
-    		termin.setStartDatum(str);
-    		termin.getStartDatum();
-    		termin.setEndDatum(str2);
-    		termin.getEndDatum();
-			tc.insertTermin(termin.getTerminName(), termin.getStartDatum(), termin.getEndDatum(), termin.getFarbe().toString());
-		}
+    	tc.getDBTermin();
     }
 
 	

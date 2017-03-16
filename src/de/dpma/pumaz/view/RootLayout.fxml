@@ -26,7 +26,7 @@
                           <buttons>
                               <Button mnemonicParsing="false" prefHeight="31.0" text="Generieren" />
                             <Button mnemonicParsing="false" onAction="#saveTable" text="Speichern" />
-                              <Button mnemonicParsing="false" text="Laden" />
+                              <Button mnemonicParsing="false" onAction="#loadTable" text="Laden" />
                               <Button mnemonicParsing="false" onAction="#handleExit" text="Abbrechen" />
                           </buttons>
                         </ButtonBar>

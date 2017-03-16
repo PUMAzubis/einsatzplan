@@ -42,7 +42,7 @@ public class TerminEditController {
     public void setDialogStage(Stage dialogStage) {
         this.stage = dialogStage;
     }
-        
+
     /**
      * Legt einen neuen Termin an.
      */
