@@ -75,6 +75,7 @@ public class TerminEditController {
     		terminNameField.setText(termin.getTerminName());
     		datePickerVon.setValue(DateUtil.parse(termin.getStartDatumName()));
     		datePickerBis.setValue(DateUtil.parse(termin.getEndDatumName()));
+    		colorPicker.setValue(termin.getFarbe());
     	}
     }
 

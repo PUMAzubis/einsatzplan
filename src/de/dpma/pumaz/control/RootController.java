@@ -123,8 +123,7 @@ public class RootController {
     @FXML
     public void saveTable(){
     	TerminConn tc = startApp.getTerminConn();
-    	
-//    	tc.establishConnection();
+
     	for (Termin termin : startApp.getTerminList()) {
     		String str = termin.getStartDatumName();
     		String str2 = termin.getEndDatumName();
@@ -134,7 +133,6 @@ public class RootController {
     		termin.getEndDatum();
 			tc.insertTermin(termin.getTerminName(), termin.getStartDatum(), termin.getEndDatum(), termin.getFarbe().toString());
 		}
-    	
     	tc.anzahlTermin();
     }
     

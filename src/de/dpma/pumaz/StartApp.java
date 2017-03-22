@@ -71,7 +71,7 @@ public class StartApp extends Application{
 	
     /**
      * Returns the data as an observable list of Termin. 
-     * @return
+     * @return Terminliste
      */
     public ObservableList<Termin> getTerminList() {
         return terminList;

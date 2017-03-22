@@ -42,7 +42,7 @@ public class TerminConnection {
 		// define the driver to use
 		String driver = "org.apache.derby.jdbc.EmbeddedDriver";
 		// the database name
-		 String dbName="testDB";
+		String dbName="testDB";
 //		String dbName = "terminDB";
 		// define the Derby connection URL to use
 		String connectionURL = "jdbc:derby:" + dbName + ";create=true";
