@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 public class TerminEditController {
 	
 	@FXML
-	private TextField terminNameField = new TextField("sdfgfdss");
+	private TextField terminNameField = new TextField();
 	@FXML
 	private DatePicker datePickerVon = new DatePicker();
 	@FXML

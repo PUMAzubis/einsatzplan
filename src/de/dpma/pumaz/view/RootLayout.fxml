@@ -19,9 +19,9 @@
             <content>
               <AnchorPane prefHeight="311.0" prefWidth="458.0">
                      <children>
-                        <TextField fx:id="nameField" layoutX="25.0" layoutY="33.0" promptText="Name(n)" />
+                        <TextField fx:id="vornameField" layoutX="25.0" layoutY="33.0" promptText="Vorname" />
                         <ComboBox fx:id="comboboxBeruf" layoutX="25.0" layoutY="82.0" prefHeight="31.0" prefWidth="187.0" promptText="Ausbildungsberuf" />
-                        <ComboBox fx:id="comboboxAusbildung" layoutX="25.0" layoutY="131.0" prefHeight="31.0" prefWidth="187.0" promptText="Ausbildungsjahr" />
+                        <ComboBox fx:id="comboboxAusbildungsjahr" layoutX="25.0" layoutY="131.0" prefHeight="31.0" prefWidth="187.0" promptText="Ausbildungsjahr" />
                         <ButtonBar buttonMinWidth="100.0" layoutX="5.0" layoutY="245.0" prefHeight="40.0" prefWidth="450.0">
                           <buttons>
                               <Button mnemonicParsing="false" text="Generieren" />
@@ -31,6 +31,7 @@
                           </buttons>
                         </ButtonBar>
                         <ComboBox fx:id="comboboxEinsatzjahr" layoutX="25.0" layoutY="181.0" prefHeight="31.0" prefWidth="187.0" promptText="Einsatzplanjahr" />
+                        <TextField fx:id="nameField" layoutX="230.0" layoutY="33.0" promptText="Name" />
                      </children>
                   </AnchorPane>
             </content>
@@ -41,7 +42,7 @@
                      <children>
                         <ButtonBar layoutX="15.0" layoutY="235.0" prefHeight="40.0" prefWidth="394.0" AnchorPane.bottomAnchor="25.0">
                           <buttons>
-                            <Button mnemonicParsing="false" onAction="#handleNewEntry" text="Neuer Eintrag" />
+                              <Button mnemonicParsing="false" onAction="#handleNewEntry" text="Neuer Eintrag" />
                               <Button mnemonicParsing="false" onAction="#handleEditTermin" text="Bearbeiten" />
                               <Button mnemonicParsing="false" onAction="#handleDeleteTermin" prefHeight="31.0" text="Löschen" />
                           </buttons>

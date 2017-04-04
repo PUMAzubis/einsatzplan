@@ -55,17 +55,16 @@ public class TerminConn {
 	private Statement s;
 	private PreparedStatement psInsert;
 	private ResultSet resultSet;
-	private String mainTable = "Termin";
+	private String terminTable = "TERMIN";
 	private String printLine = "  __________________________________________________";
-	private String createString = "CREATE TABLE " + mainTable
+	private String createString = "CREATE TABLE " + terminTable
 			+ " (TERMIN_ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)"
 			+ "   CONSTRAINT Termin_PK PRIMARY KEY, "
 			+ " TERMINNAME VARCHAR(32) NOT NULL, STARTDATUM DATE, ENDDATUM DATE, COLOR VARCHAR(255)) ";
-	private String insertString = "INSERT INTO " + mainTable
+	private String insertString = "INSERT INTO " + terminTable
 			+ " (TERMINNAME, STARTDATUM, ENDDATUM, COLOR) values (?, ? , ?, ?)";
-	
-	private String searchByString = "select TERMINNAME, STARTDATUM, ENDDATUM, COLOR from " + mainTable + " order by TERMINNAME";
-	private String deleteString = "DROP TABLE " + mainTable;
+	private String searchByString = "select TERMIN_ID, TERMINNAME, STARTDATUM, ENDDATUM, COLOR from " + terminTable + " order by TERMIN_ID";
+	private String deleteString = "DROP TABLE " + terminTable;
 	private String countString = "SELECT COUNT(*) FROM TERMIN";
 	private StartApp startApp;
 
@@ -102,12 +101,12 @@ public class TerminConn {
 		try {
 			s = conn.createStatement();
 			// Call utility method to check if table exists.
-			if (doesTableExist(conn, mainTable)) { // soll false sein
-				System.err.println("Tabelle existiert nicht??");
-				psInsert = conn.prepareStatement(createString);
-				psInsert.execute();
-				System.err.println("Tabelle exisitiert doch");
-			}
+//			if (doesTableExist(conn, terminTable, psInsert, createString)) { // soll false sein
+//				psInsert = conn.prepareStatement(createString);
+//				psInsert.execute();
+//			}
+			
+			doesTableExist(conn, terminTable, psInsert, createString);
 
 			// Prepare the insert statement to use
 			psInsert = conn.prepareStatement(insertString);
@@ -128,8 +127,11 @@ public class TerminConn {
 				System.out.println(printLine);
 				while (resultSet.next()) {
 					System.out.println(
-							"Terminname ist " + resultSet.getString(1) + " und er geht von " + resultSet.getDate(2)
-									+ " bis " + resultSet.getDate(3) + ". Farbe ist  " + resultSet.getString(4));
+//							"Terminname ist " + resultSet.getString(1) + " und er geht von " + resultSet.getDate(2)
+//									+ " bis " + resultSet.getDate(3) + ". Farbe ist  " + resultSet.getString(4));
+							"Terminid ist " + resultSet.getInt(1) + " und er heißt " + resultSet.getString(2)
+							+ " und er geht von " + resultSet.getDate(3) + " bis"+ resultSet.getDate(4)
+							+ ". Farbe ist  " + resultSet.getString(4));
 				}
 				System.out.println(printLine);
 				// Close the resultSet
@@ -179,22 +181,28 @@ public class TerminConn {
 		System.out.println("Closed connection");
 	}
 
-	public static boolean doesTableExist(Connection conn, String tablename) throws SQLException {
+	public static boolean doesTableExist(Connection conn, String tablename, PreparedStatement psInsert, String createString) throws SQLException {
+		tablename = tablename.toLowerCase();
 		try (ResultSet resSet = conn.getMetaData().getTables(null, null, tablename, null)) {
 			while (resSet.next()) {
 				System.out.println(resSet.next());
 				String table = resSet.getString("TERMIN");
 				System.out.println(table);
-				if (table.toLowerCase().equals(tablename.toLowerCase())) {
-					System.out.println("Tabellenname ist " + table);
-					return true;
+				if (table.toLowerCase().equals(tablename)) {
+					System.out.println("Die Tabelle existiert!" );
+					System.out.println("Tabellenname " + table + " " + tablename);
+					
+				}else{
+					psInsert = conn.prepareStatement(createString);
+					psInsert.execute();
 				}
+				return true;
 			}
 		} catch (SQLException e) {
 			System.err.println("SQLException in doesTableExist");
 			e.printStackTrace();
 		}
-		System.err.println("doesTableExist wirft false");
+		System.err.println("doesTableExist wirft true");
 		return false;
 	}
 	
@@ -206,16 +214,15 @@ public class TerminConn {
 		ObservableList<Termin> list = FXCollections.observableArrayList();
 		list = startApp.getTerminList();
 		try {
-			
 			s = conn.createStatement();
 			// Select all records in the TERMIN table
 			resultSet = s.executeQuery(searchByString);
 
 			// Loop through the ResultSet and print the data
 			while (resultSet.next()) {
-				String s = resultSet.getString(4);
+				String s = resultSet.getString(5);
 				Color color = Color.web(s);
-				Termin termin = new Termin(resultSet.getString(1),resultSet.getDate(2).toLocalDate(), resultSet.getDate(3).toLocalDate(),  color); 
+				Termin termin = new Termin(resultSet.getString(2),resultSet.getDate(3).toLocalDate(), resultSet.getDate(4).toLocalDate(),  color); 
 				StartApp.addTermin(termin);
 			}
 			resultSet.close();

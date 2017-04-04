@@ -7,7 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.dpma.pumaz.StartApp;
+import de.dpma.pumaz.dao.AzubiDAO;
 import de.dpma.pumaz.dao.TerminConn;
+import de.dpma.pumaz.model.Auszubildender;
 import de.dpma.pumaz.model.Termin;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,12 +30,14 @@ public class RootController {
 	@FXML
 	private ComboBox<String> comboboxBeruf;
 	@FXML 
-	private ComboBox<Integer> comboboxAusbildung;
+	private ComboBox<Integer> comboboxAusbildungsjahr = new ComboBox<Integer>();
 	@FXML
 	private ComboBox <Integer> comboboxEinsatzjahr;
 	@FXML
     private TextField nameField;
 	@FXML
+	private TextField vornameField;	
+	@FXML	
 	private TableView<Termin> terminTable = new TableView<Termin>();
 	@FXML
 	private TableColumn<Termin, String> terminNameColumn;
@@ -41,7 +45,7 @@ public class RootController {
 	private TableColumn<Termin, String> terminVonColumn;
 	@FXML
 	private TableColumn<Termin, String> terminBisColumn;
-	@FXML 
+	@FXML
 	private TableColumn<Termin, Color> colorColumn;
 	
 	List<String> ausbildungsberuf = Arrays.asList("Fachinformatiker", "INKA", "VFA", "KFB", "FAMI", "Schreiner", "Elektroniker");
@@ -60,7 +64,7 @@ public class RootController {
 	@FXML
 	public void initialize(){
 		  // Initialize the person table with the two columns.
-//		terminTable.setVisible(true);
+		terminTable.setVisible(true);
         terminNameColumn.setCellValueFactory(cellData -> cellData.getValue().terminNameProperty());
         terminVonColumn.setCellValueFactory(cellData -> cellData.getValue().startDatumNameProperty());
         terminBisColumn.setCellValueFactory(cellData -> cellData.getValue().endDatumNameProperty());
@@ -69,7 +73,7 @@ public class RootController {
 		setEinsatzjahre();
 		comboboxBeruf.getItems().addAll(ausbildungsberuf);
 		comboboxEinsatzjahr.getItems().addAll(einsatzplanjahre);
-		comboboxAusbildung.getItems().addAll(ausbildungsjahre);
+		comboboxAusbildungsjahr.getItems().addAll(ausbildungsjahre);
 	}
 	
     /**
@@ -117,13 +121,30 @@ public class RootController {
         terminTable.setItems(startApp.getTerminList());
     }
     
+    private Auszubildender getAzubi(){
+    	Auszubildender azubi = null;
+    	String name = nameField.getText();
+    	String vorname = vornameField.getText();
+    	Integer ausbildungsJahr = comboboxAusbildungsjahr.getValue();
+    	String beruf = comboboxBeruf.getValue();
+    	if(!name.equals("") && !vorname.equals("")){
+    		azubi = new Auszubildender(name, vorname, ausbildungsJahr, beruf);
+    	}
+    	return azubi;
+    }
+    
     /**
      * Speichert die Einträge der Tabelle in der Datenbank.
      */
     @FXML
-    public void saveTable(){
+    private void saveTable(){
     	TerminConn tc = startApp.getTerminConn();
-
+    	AzubiDAO aDAO = new AzubiDAO();
+    	
+    	if(getAzubi() != null){
+    		aDAO.insertAzubi(getAzubi(), tc.getConnection());
+    	}
+    	
     	for (Termin termin : startApp.getTerminList()) {
     		String str = termin.getStartDatumName();
     		String str2 = termin.getEndDatumName();
@@ -141,12 +162,11 @@ public class RootController {
 	 * Tabelle übernommen.
 	 */
     @FXML
-    public void loadTable(){
+    private void loadTable(){
     	TerminConn tc = startApp.getTerminConn();
     	tc.getDBTermin();
     }
 
-	
     /**
      * Öffnet ein neues Fenster, in welchem man Termine anlegen kann.
      */
