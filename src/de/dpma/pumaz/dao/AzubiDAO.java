@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import de.dpma.pumaz.StartApp;
 import de.dpma.pumaz.model.Auszubildender;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,12 +25,15 @@ public class AzubiDAO {
 				+ " NAME VARCHAR(32) NOT NULL, VORNAME VARCHAR(32) NOT NULL, LEHRJAHR INT, AUSBILDUNGSBERUF VARCHAR(255) NOT NULL) ";
 		private String insertString = "INSERT INTO " + mainTable
 				+ " (NAME, VORNAME, LEHRJAHR, AUSBILDUNGSBERUF) values (?, ? , ?, ?)";
-		
 		private String searchByString = "select AZUBI_ID, NAME, VORNAME, LEHRJAHR, AUSBILDUNGSBERUF from " + mainTable + " order by AZUBI_ID";
 		private String deleteString = "DROP TABLE " + mainTable;
 		private String countString = "SELECT COUNT(*) FROM " + mainTable;
-		private StartApp startApp;
 		
+		/**
+		 * Fügt einen Auszubildenden die Tabelle AZUBI ein.
+		 * @param azubi
+		 * @param con
+		 */
 		public void insertAzubi(Auszubildender azubi, Connection con) {
 			this.conn = con;
 			// JDBC code sections
@@ -78,8 +80,8 @@ public class AzubiDAO {
 
 //					 System.err.println("Tabelle " + mainTable + " wird versucht
 //					 zu löschen.");
-					 psInsert = conn.prepareStatement(deleteString);
-					 psInsert.execute();
+//					 psInsert = conn.prepareStatement(deleteString);
+//					 psInsert.execute();
 					// System.err.println("Tabelle " + mainTable + " gelöscht.");
 				} // END of IF block
 			} catch (SQLException sqlE) {
@@ -92,7 +94,7 @@ public class AzubiDAO {
 		}
 		
 		/**
-		 * Überprüft, ob eine Tabelle bereits existiert, falls nicht, legt er sie an und gibt einen boolean zurück.
+		 * Überprüft, ob eine Tabelle bereits existiert, falls nicht, wird false zurückgegeben.
 		 * @param conn
 		 * @param tablename
 		 * @param psInsert
@@ -101,12 +103,9 @@ public class AzubiDAO {
 		 * @throws SQLException
 		 */
 	public boolean doesTableExist(String tablename) throws SQLException {
-		// tablename = tablename.toLowerCase();
-		
 		try (ResultSet resSet = conn.getMetaData().getTables(null, null, tablename, new String[]{"TABLE","VIEW"})) {
 			System.out.println("cknd" + resSet.getMetaData().getColumnName(1));
 			if (resSet.next()) {
-				System.out.println("Tabelle existiert bereits");
 				resSet.close();
 				return true;
 			}
@@ -121,17 +120,9 @@ public class AzubiDAO {
 //					return true;
 //				}
 //			}
-			
 		} catch (SQLException e) {
-			System.out.println(e.getSQLState());
-			System.out.println(e.getMessage());
-			if (e.getSQLState().equals("X0Y32")) {
-				System.out.println("X0Y32 ist aufgetreten");
-			}else{
-				System.out.println("Anderer Fehler aufgetreten");
-			}
-//			System.err.println("SQLException in doesTableExist");
-//			e.printStackTrace();
+			System.err.println("SQLException in doesTableExist");
+			e.printStackTrace();
 		}
 		System.err.println("doesTableExist wirft false");
 		return false;

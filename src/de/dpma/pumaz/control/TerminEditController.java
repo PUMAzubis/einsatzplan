@@ -54,7 +54,13 @@ public class TerminEditController {
     		alert.setHeaderText("Terminname fehlt");
     		alert.setContentText("Sie haben keinen Terminnamen angegeben. Bitte fügen Sie einen hinzu.");
     		alert.showAndWait();
-	    	}else{
+	    	}
+    		else if(datePickerVon.getValue().isAfter(datePickerBis.getValue())) {
+			Alert alert = new Alert(AlertType.WARNING);
+    		alert.setHeaderText("Bitte Datum korrigieren.");
+    		alert.setContentText("Ihr Enddatum liegt weiter in der Vergangenheit als ihr Startdatum. Bitte korrigieren Sie das.");
+    		alert.showAndWait();
+    		}else{
 	    		System.out.println(index);
 	    		StartApp.addTermin(new Termin(terminNameField.getText(), datePickerVon.getValue(), datePickerBis.getValue(), colorPicker.getValue()));
 	    		stage.close();

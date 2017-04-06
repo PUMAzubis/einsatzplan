@@ -47,7 +47,7 @@ public class TerminConn {
 	// define the driver to use
 	private String driver = "org.apache.derby.jdbc.EmbeddedDriver";
 	// the database name
-	private String dbName = "testDB";
+	private String dbName = "constraintDB";
 	// String dbName = "terminDB";
 	// define the Derby connection URL to use
 	private String connectionURL = "jdbc:derby:" + dbName + ";create=true";
@@ -57,10 +57,14 @@ public class TerminConn {
 	private ResultSet resultSet;
 	private String terminTable = "TERMIN";
 	private String printLine = "  __________________________________________________";
+//	private String createString = "CREATE TABLE " + terminTable
+//			+ " (TERMIN_ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)"
+//			+ "   CONSTRAINT Termin_PK PRIMARY KEY, "
+//			+ " TERMINNAME VARCHAR(32) NOT NULL, STARTDATUM DATE, ENDDATUM DATE, COLOR VARCHAR(255)) ";
 	private String createString = "CREATE TABLE " + terminTable
 			+ " (TERMIN_ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)"
 			+ "   CONSTRAINT Termin_PK PRIMARY KEY, "
-			+ " TERMINNAME VARCHAR(32) NOT NULL, STARTDATUM DATE, ENDDATUM DATE, COLOR VARCHAR(255)) ";
+			+ " TERMINNAME VARCHAR(32) NOT NULL, STARTDATUM DATE, ENDDATUM DATE, COLOR VARCHAR(255), AZUBI_FK INTEGER, CONSTRAINT AZUBI_FK FOREIGN KEY(AZUBI_FK) REFERENCES APP.AZUBI(AZUBI_ID)) ";
 	private String insertString = "INSERT INTO " + terminTable
 			+ " (TERMINNAME, STARTDATUM, ENDDATUM, COLOR) values (?, ? , ?, ?)";
 	private String searchByString = "select TERMIN_ID, TERMINNAME, STARTDATUM, ENDDATUM, COLOR from " + terminTable + " order by TERMIN_ID";
@@ -101,14 +105,13 @@ public class TerminConn {
 		try {
 			s = conn.createStatement();
 			// Call utility method to check if table exists.
-			if (!doesTableExist(conn, terminTable)) { // soll false sein
+			if (!doesTableExist(terminTable)) { // soll false sein
+				System.out.println("TABELLE WIRD ANGELEGT");
 				psInsert = conn.prepareStatement(createString);
 				psInsert.execute();
 			}
-
 			// Prepare the insert statement to use
 			psInsert = conn.prepareStatement(insertString);
-
 			// Check if it is time to EXIT, if not insert the data
 			if (!terminname.equals("")) {
 				// Insert the text entered into the WISH_ITEM table
@@ -188,18 +191,14 @@ public class TerminConn {
 	 * @return true, falls die Tabelle existiert. Sonst false.
 	 * @throws SQLException
 	 */
-	public boolean doesTableExist(Connection conn, String tablename) throws SQLException {
-		tablename = tablename.toLowerCase();
+	public boolean doesTableExist(String tablename) throws SQLException {
 		try (ResultSet resSet = conn.getMetaData().getTables(null, null, tablename, new String[]{"TABLE", "VIEW"})) {
-			while (resSet.next()) {
-				System.out.println(resSet.next());
-				String table = resSet.getString("TERMIN");
-				System.out.println(table);
-				if (table.toLowerCase().equals(tablename)) {
-					System.out.println("Die Tabelle existiert!" );
-					System.out.println("Tabellenname " + table + " " + tablename);
-				}
+			if (resSet.next()) {
+				resSet.close();
 				return true;
+			}else{
+				resSet.close();
+				return false;
 			}
 		} catch (SQLException e) {
 			System.err.println("SQLException in doesTableExist");
@@ -248,7 +247,7 @@ public class TerminConn {
 			resultSet = s.executeQuery(countString);
 			resultSet.next();
 			rowCount = resultSet.getInt(1);
-			System.out.println("anzahlTermine " + rowCount);
+			System.out.println("anzahlTermine " + rowCount);	
 			s.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
