@@ -27,7 +27,8 @@ public class StartApp extends Application{
 	}
 	
 	public StartApp(){
-
+//		terminConn.establishConnection();
+//		terminConn.setApp(this);
 //		terminList.add(new Termin("Berufsschule"));
 //		terminList.add(new Termin("Gesundheitstag"));
 //		terminList.add(new Termin("Kindergarten", LocalDate.of(2012, 12, 20), LocalDate.of(2013, 2, 12)));
@@ -63,7 +64,7 @@ public class StartApp extends Application{
 	}
 	
 	/**
-	 * 
+	 * Holt sich den ersten Eintrag aus der Termin-Liste.
 	 */
 	public static void getFirstIndex(){
 		terminList.get(0);
@@ -77,11 +78,19 @@ public class StartApp extends Application{
         return terminList;
     }
     
+    /**
+     * Überprüft, ob die Liste leer ist.
+     * @return true, falls die Liste leer ist.
+     */
     public static boolean isEmpty(){
     	if(terminList.isEmpty()){
     		return true;
     	}
     	return false;
+    }
+    
+    public StartApp getSA(){
+    	return this;
     }
 	
 	@Override

@@ -8,6 +8,8 @@ import java.sql.Statement;
 
 import de.dpma.pumaz.StartApp;
 import de.dpma.pumaz.model.Auszubildender;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class AzubiDAO {
 
@@ -20,14 +22,14 @@ public class AzubiDAO {
 		private String printLine = "  __________________________________________________";
 		private String createString = "CREATE TABLE " + mainTable
 				+ " (AZUBI_ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)"
-				+ "   CONSTRAINT Termin_PK PRIMARY KEY, "
-				+ " NAME VARCHAR(32) NOT NULL, VORNAME VARCHAR(32) NOT NULL, LEHRJAHR INT, AUSBILDUNGSBERUF VARCHAR(255)) ";
+				+ "   CONSTRAINT AZUBI_PK PRIMARY KEY, "
+				+ " NAME VARCHAR(32) NOT NULL, VORNAME VARCHAR(32) NOT NULL, LEHRJAHR INT, AUSBILDUNGSBERUF VARCHAR(255) NOT NULL) ";
 		private String insertString = "INSERT INTO " + mainTable
-				+ " (NAME, VORNAME, LEHRJAHR, AUSBILDUNGUNGSBERUF) values (?, ? , ?, ?)";
+				+ " (NAME, VORNAME, LEHRJAHR, AUSBILDUNGSBERUF) values (?, ? , ?, ?)";
 		
 		private String searchByString = "select AZUBI_ID, NAME, VORNAME, LEHRJAHR, AUSBILDUNGSBERUF from " + mainTable + " order by AZUBI_ID";
 		private String deleteString = "DROP TABLE " + mainTable;
-		private String countString = "SELECT COUNT(*) FROM AZUBI";
+		private String countString = "SELECT COUNT(*) FROM " + mainTable;
 		private StartApp startApp;
 		
 		public void insertAzubi(Auszubildender azubi, Connection con) {
@@ -38,14 +40,10 @@ public class AzubiDAO {
 			try {
 				s = conn.createStatement();
 				// Call utility method to check if table exists.
-//				if (doesTableExist(conn, mainTable)) { // soll false sein
-//					System.err.println("Tabelle existiert nicht??");
-//					psInsert = conn.prepareStatement(createString);
-//					psInsert.execute();
-//					System.err.println("Tabelle exisitiert doch");
-//				}
-
-				doesTableExist(conn, mainTable, psInsert, createString);
+				if (!doesTableExist(mainTable)) { // soll false sein
+					psInsert = conn.prepareStatement(createString);
+					psInsert.execute();
+				}
 				
 				// Prepare the insert statement to use
 				psInsert = conn.prepareStatement(insertString);
@@ -57,6 +55,7 @@ public class AzubiDAO {
 					psInsert.setString(2, azubi.getVorname());
 					psInsert.setInt(3, azubi.getLehrjahr());
 					psInsert.setString(4, azubi.getAusbildungsberuf());
+					System.out.println("azubi.Ausbildung " +azubi.getAusbildungsberuf() );
 					psInsert.executeUpdate();
 
 					// Select all records in the TERMIN table
@@ -77,10 +76,10 @@ public class AzubiDAO {
 					psInsert.close();
 					s.close();
 
-					// System.err.println("Tabelle " + mainTable + " wird versucht
-					// zu löschen.");
-					// psInsert = conn.prepareStatement(deleteString);
-					// psInsert.execute();
+//					 System.err.println("Tabelle " + mainTable + " wird versucht
+//					 zu löschen.");
+					 psInsert = conn.prepareStatement(deleteString);
+					 psInsert.execute();
 					// System.err.println("Tabelle " + mainTable + " gelöscht.");
 				} // END of IF block
 			} catch (SQLException sqlE) {
@@ -92,26 +91,70 @@ public class AzubiDAO {
 			 ***/
 		}
 		
-		public static boolean doesTableExist(Connection conn, String tablename, PreparedStatement psInsert, String createString) throws SQLException {
-			tablename = tablename.toLowerCase();
-			try (ResultSet resSet = conn.getMetaData().getTables(null, null, tablename, null)) {
-				while (resSet.next()) {
-					System.out.println(resSet.next());
-					String table = resSet.getString("AZUBI");
-					System.out.println(table);
-					if (table.toLowerCase().equals(tablename)) {
-						System.out.println("Tabellenname ist " + table);
-					}else{
-						psInsert = conn.prepareStatement(createString);
-						psInsert.execute();
-					}
-					return true;
-				}
-			} catch (SQLException e) {
-				System.err.println("SQLException in doesTableExist");
-				e.printStackTrace();
+		/**
+		 * Überprüft, ob eine Tabelle bereits existiert, falls nicht, legt er sie an und gibt einen boolean zurück.
+		 * @param conn
+		 * @param tablename
+		 * @param psInsert
+		 * @param createString
+		 * @return true, falls die Tabelle existiert. Sonst false.
+		 * @throws SQLException
+		 */
+	public boolean doesTableExist(String tablename) throws SQLException {
+		// tablename = tablename.toLowerCase();
+		
+		try (ResultSet resSet = conn.getMetaData().getTables(null, null, tablename, new String[]{"TABLE","VIEW"})) {
+			System.out.println("cknd" + resSet.getMetaData().getColumnName(1));
+			if (resSet.next()) {
+				System.out.println("Tabelle existiert bereits");
+				resSet.close();
+				return true;
 			}
-			System.err.println("doesTableExist wirft false");
-			return true;
+			else{
+				resSet.close();
+				return false;
+			}
+//				SOOOOOO EEEEIIIIIIIN DREEEEEEEEEEEEEEEEEEECK: System.out.println("ResultSet " + resSet.getString("AZUBI"));
+//				String table = resSet.getString("AZUBI");
+//				if (table.equals(tablename)) {
+//					System.out.println("Tabellenname ist " + table);
+//					return true;
+//				}
+//			}
+			
+		} catch (SQLException e) {
+			System.out.println(e.getSQLState());
+			System.out.println(e.getMessage());
+			if (e.getSQLState().equals("X0Y32")) {
+				System.out.println("X0Y32 ist aufgetreten");
+			}else{
+				System.out.println("Anderer Fehler aufgetreten");
+			}
+//			System.err.println("SQLException in doesTableExist");
+//			e.printStackTrace();
 		}
+		System.err.println("doesTableExist wirft false");
+		return false;
+	}
+	
+	public ObservableList<Auszubildender> getDBAzubi(){
+		ObservableList<Auszubildender> list = FXCollections.observableArrayList();
+		try {
+			s = conn.createStatement();
+			// Select all records in the TERMIN table
+			resultSet = s.executeQuery(searchByString);
+			// Loop through the ResultSet and print the data
+			while (resultSet.next()) {
+				System.out.println("Name " + resultSet.getString(2));
+				Auszubildender azubi = new Auszubildender(resultSet.getString(2),resultSet.getString(3), resultSet.getInt(4),  resultSet.getString(5)); 
+				list.add(azubi);
+			}
+			resultSet.close();
+			s.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return list;
+	}
 }

@@ -65,7 +65,7 @@ public class TerminConn {
 			+ " (TERMINNAME, STARTDATUM, ENDDATUM, COLOR) values (?, ? , ?, ?)";
 	private String searchByString = "select TERMIN_ID, TERMINNAME, STARTDATUM, ENDDATUM, COLOR from " + terminTable + " order by TERMIN_ID";
 	private String deleteString = "DROP TABLE " + terminTable;
-	private String countString = "SELECT COUNT(*) FROM TERMIN";
+	private String countString = "SELECT COUNT(*) FROM " + terminTable;
 	private StartApp startApp;
 
 	public Connection establishConnection() {
@@ -101,12 +101,10 @@ public class TerminConn {
 		try {
 			s = conn.createStatement();
 			// Call utility method to check if table exists.
-//			if (doesTableExist(conn, terminTable, psInsert, createString)) { // soll false sein
-//				psInsert = conn.prepareStatement(createString);
-//				psInsert.execute();
-//			}
-			
-			doesTableExist(conn, terminTable, psInsert, createString);
+			if (!doesTableExist(conn, terminTable)) { // soll false sein
+				psInsert = conn.prepareStatement(createString);
+				psInsert.execute();
+			}
 
 			// Prepare the insert statement to use
 			psInsert = conn.prepareStatement(insertString);
@@ -181,9 +179,18 @@ public class TerminConn {
 		System.out.println("Closed connection");
 	}
 
-	public static boolean doesTableExist(Connection conn, String tablename, PreparedStatement psInsert, String createString) throws SQLException {
+	/**
+	 * Überprüft, ob eine Tabelle bereits existiert, falls nicht, legt er sie an und gibt einen boolean zurück.
+	 * @param conn
+	 * @param tablename
+	 * @param psInsert
+	 * @param createString
+	 * @return true, falls die Tabelle existiert. Sonst false.
+	 * @throws SQLException
+	 */
+	public boolean doesTableExist(Connection conn, String tablename) throws SQLException {
 		tablename = tablename.toLowerCase();
-		try (ResultSet resSet = conn.getMetaData().getTables(null, null, tablename, null)) {
+		try (ResultSet resSet = conn.getMetaData().getTables(null, null, tablename, new String[]{"TABLE", "VIEW"})) {
 			while (resSet.next()) {
 				System.out.println(resSet.next());
 				String table = resSet.getString("TERMIN");
@@ -191,10 +198,6 @@ public class TerminConn {
 				if (table.toLowerCase().equals(tablename)) {
 					System.out.println("Die Tabelle existiert!" );
 					System.out.println("Tabellenname " + table + " " + tablename);
-					
-				}else{
-					psInsert = conn.prepareStatement(createString);
-					psInsert.execute();
 				}
 				return true;
 			}
@@ -208,7 +211,7 @@ public class TerminConn {
 	
 	/**
 	 * Liest die Information eines Termins aus der Datenbank aus und gibt ihn zurück.
-	 * @return termin
+	 * @return Liste, die mit Einträgen aus der Datenbank gefüllt wird.
 	 */
 	public ObservableList<Termin> getDBTermin(){
 		ObservableList<Termin> list = FXCollections.observableArrayList();
@@ -234,6 +237,10 @@ public class TerminConn {
 		return list;
 	}
 	
+	/**
+	 * Überprüft wie viele Termine in der Tabelle stehen.
+	 * @return anzahl der Termine
+	 */
 	public int anzahlTermin(){
 		int rowCount = 0;
 		try {

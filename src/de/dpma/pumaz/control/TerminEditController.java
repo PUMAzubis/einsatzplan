@@ -44,7 +44,7 @@ public class TerminEditController {
     }
 
     /**
-     * Legt einen neuen Termin an.
+     * Legt einen neuen Termin an, solange der Name vorhanden ist. Ansonsten gibt es eine Fehlermeldung.
      */
     @FXML
     private void handleSubmit(){
@@ -66,6 +66,11 @@ public class TerminEditController {
     	} 
     }
     
+    /**
+     * 
+     * @param index
+     * @param termin
+     */
     public void setEntries(int index, Termin termin){
     	if(termin == null ){
     		System.out.println("Kein Objekt von Termin: ");
