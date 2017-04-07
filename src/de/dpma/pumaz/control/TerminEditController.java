@@ -73,7 +73,7 @@ public class TerminEditController {
     }
     
     /**
-     * 
+     * Setzt die Einträge zum Bearbeiten in das Termin-Edit-Fenster
      * @param index
      * @param termin
      */

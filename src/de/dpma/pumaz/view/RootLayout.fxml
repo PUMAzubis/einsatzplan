@@ -11,11 +11,11 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="350.0" prefWidth="477.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.dpma.pumaz.control.RootController">
+<AnchorPane minHeight="350.0" minWidth="480.0" prefHeight="350.0" prefWidth="480.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.dpma.pumaz.control.RootController">
    <children>
-      <TabPane layoutX="21.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TabPane fx:id="tabPane" layoutX="21.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <tabs>
-          <Tab text="Daten">
+          <Tab fx:id="tab" text="Daten">
             <content>
               <AnchorPane prefHeight="311.0" prefWidth="458.0">
                      <children>
@@ -36,7 +36,7 @@
                   </AnchorPane>
             </content>
           </Tab>
-          <Tab text="Erweitert">
+          <Tab fx:id="tab2" text="Erweitert">
             <content>
               <AnchorPane prefHeight="180.0" prefWidth="200.0">
                      <children>

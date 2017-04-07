@@ -97,6 +97,9 @@ public class StartApp extends Application{
 	public void start(Stage primaryStage) throws Exception {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("Einsatzplan");
+//		this.primaryStage.setResizable(false);
+		this.primaryStage.setMinWidth(500);
+		this.primaryStage.setMinHeight(370);
 		terminConn.establishConnection();
 		terminConn.setApp(this);
 		initRootLayout();

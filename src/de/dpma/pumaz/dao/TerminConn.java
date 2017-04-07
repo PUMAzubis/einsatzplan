@@ -47,7 +47,7 @@ public class TerminConn {
 	// define the driver to use
 	private String driver = "org.apache.derby.jdbc.EmbeddedDriver";
 	// the database name
-	private String dbName = "constraintDB";
+	private String dbName = "constraintDB2";
 	// String dbName = "terminDB";
 	// define the Derby connection URL to use
 	private String connectionURL = "jdbc:derby:" + dbName + ";create=true";
@@ -66,8 +66,8 @@ public class TerminConn {
 			+ "   CONSTRAINT Termin_PK PRIMARY KEY, "
 			+ " TERMINNAME VARCHAR(32) NOT NULL, STARTDATUM DATE, ENDDATUM DATE, COLOR VARCHAR(255), AZUBI_FK INTEGER, CONSTRAINT AZUBI_FK FOREIGN KEY(AZUBI_FK) REFERENCES APP.AZUBI(AZUBI_ID)) ";
 	private String insertString = "INSERT INTO " + terminTable
-			+ " (TERMINNAME, STARTDATUM, ENDDATUM, COLOR) values (?, ? , ?, ?)";
-	private String searchByString = "select TERMIN_ID, TERMINNAME, STARTDATUM, ENDDATUM, COLOR from " + terminTable + " order by TERMIN_ID";
+			+ " (TERMINNAME, STARTDATUM, ENDDATUM, COLOR, AZUBI_FK) values (?, ?, ?, ?, ?)";
+	private String searchByString = "select * from " + terminTable + " order by TERMIN_ID";
 	private String deleteString = "DROP TABLE " + terminTable;
 	private String countString = "SELECT COUNT(*) FROM " + terminTable;
 	private StartApp startApp;
@@ -96,7 +96,7 @@ public class TerminConn {
 		return conn;
 	}
 
-	public void insertTermin(String terminname, LocalDate localD, LocalDate localD2, String color) {
+	public void insertTermin(String terminname, LocalDate localD, LocalDate localD2, String color, int id) {
 		Date dateStart = Date.valueOf(localD);
 		Date dateEnd = Date.valueOf(localD2);
 		// JDBC code sections
@@ -119,6 +119,7 @@ public class TerminConn {
 				psInsert.setDate(2, dateStart);
 				psInsert.setDate(3, dateEnd);
 				psInsert.setString(4, color);
+				psInsert.setInt(5, id);
 				psInsert.executeUpdate();
 
 				// Select all records in the TERMIN table
@@ -130,7 +131,7 @@ public class TerminConn {
 					System.out.println(
 //							"Terminname ist " + resultSet.getString(1) + " und er geht von " + resultSet.getDate(2)
 //									+ " bis " + resultSet.getDate(3) + ". Farbe ist  " + resultSet.getString(4));
-							"Terminid ist " + resultSet.getInt(1) + " und er heißt " + resultSet.getString(2)
+							"Terminid ist " + resultSet.getInt(1) + ". Name: " + resultSet.getString(2)
 							+ " und er geht von " + resultSet.getDate(3) + " bis"+ resultSet.getDate(4)
 							+ ". Farbe ist  " + resultSet.getString(4));
 				}
@@ -184,11 +185,8 @@ public class TerminConn {
 
 	/**
 	 * Überprüft, ob eine Tabelle bereits existiert, falls nicht, legt er sie an und gibt einen boolean zurück.
-	 * @param conn
 	 * @param tablename
-	 * @param psInsert
-	 * @param createString
-	 * @return true, falls die Tabelle existiert. Sonst false.
+	 * @return boolean, true, wenn die Tabelle existiert. Sonst false.
 	 * @throws SQLException
 	 */
 	public boolean doesTableExist(String tablename) throws SQLException {

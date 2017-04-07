@@ -28,6 +28,7 @@ public class AzubiDAO {
 		private String searchByString = "select AZUBI_ID, NAME, VORNAME, LEHRJAHR, AUSBILDUNGSBERUF from " + mainTable + " order by AZUBI_ID";
 		private String deleteString = "DROP TABLE " + mainTable;
 		private String countString = "SELECT COUNT(*) FROM " + mainTable;
+		private int id;
 		
 		/**
 		 * Fügt einen Auszubildenden die Tabelle AZUBI ein.
@@ -63,6 +64,10 @@ public class AzubiDAO {
 					// Select all records in the TERMIN table
 					resultSet = s.executeQuery(searchByString);
 
+					resultSet.next();
+					id = resultSet.getInt(1);
+					System.out.println("ID " + id);
+					
 					// Loop through the ResultSet and print the data
 					System.out.println(printLine);
 					while (resultSet.next()) {
@@ -95,10 +100,7 @@ public class AzubiDAO {
 		
 		/**
 		 * Überprüft, ob eine Tabelle bereits existiert, falls nicht, wird false zurückgegeben.
-		 * @param conn
 		 * @param tablename
-		 * @param psInsert
-		 * @param createString
 		 * @return true, falls die Tabelle existiert. Sonst false.
 		 * @throws SQLException
 		 */
@@ -147,5 +149,9 @@ public class AzubiDAO {
 			e.printStackTrace();
 		}
 		return list;
+	}
+	
+	public int getAzubiID(){
+		return id;
 	}
 }

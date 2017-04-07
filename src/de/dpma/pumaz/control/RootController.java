@@ -11,12 +11,16 @@ import de.dpma.pumaz.dao.AzubiDAO;
 import de.dpma.pumaz.dao.TerminConn;
 import de.dpma.pumaz.model.Auszubildender;
 import de.dpma.pumaz.model.Termin;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -47,6 +51,12 @@ public class RootController {
 	private TableColumn<Termin, String> terminBisColumn;
 	@FXML
 	private TableColumn<Termin, Color> colorColumn;
+	@FXML
+	private TabPane tabPane;
+	@FXML
+	private Tab tab;
+	@FXML
+	private Tab tab2;
 	
 	List<String> ausbildungsberuf = Arrays.asList("Fachinformatiker", "INKA", "VFA", "KFB", "FAMI", "Schreiner", "Elektroniker");
 	List<Integer> ausbildungsjahre = Arrays.asList(1, 2, 3, 4);
@@ -69,11 +79,20 @@ public class RootController {
         terminVonColumn.setCellValueFactory(cellData -> cellData.getValue().startDatumNameProperty());
         terminBisColumn.setCellValueFactory(cellData -> cellData.getValue().endDatumNameProperty());
         colorColumn.setCellValueFactory(cellData -> cellData.getValue().colorProperty());
-
+        
 		setEinsatzjahre();
 		comboboxBeruf.getItems().addAll(ausbildungsberuf);
 		comboboxEinsatzjahr.getItems().addAll(einsatzplanjahre);
 		comboboxAusbildungsjahr.getItems().addAll(ausbildungsjahre);
+		
+		tab.setOnSelectionChanged(new EventHandler<Event>() {
+			@Override
+			public void handle(Event event) {
+				if (tab2.isSelected()) {
+					startApp.getPrimaryStage().setResizable(true);
+				}
+			}
+		});
 	}
 	
     /**
@@ -121,6 +140,10 @@ public class RootController {
         terminTable.setItems(startApp.getTerminList());
     }
     
+    /**
+     * Gibt einen Auszubildenden zum Speichern für die Datenbank zurück.
+     * @return Auszubildenden
+     */
     private Auszubildender getAzubi(){
     	Auszubildender azubi = null;
     	String name = nameField.getText();
@@ -140,10 +163,13 @@ public class RootController {
     private void saveTable(){
     	TerminConn tc = startApp.getTerminConn();
     	AzubiDAO aDAO = new AzubiDAO();
+    	int id;
     	
     	if(getAzubi() != null){
     		aDAO.insertAzubi(getAzubi(), tc.getConnection());
     	}
+    	
+    	id = aDAO.getAzubiID();
     	
     	for (Termin termin : startApp.getTerminList()) {
     		String str = termin.getStartDatumName();
@@ -152,7 +178,7 @@ public class RootController {
     		termin.getStartDatum();
     		termin.setEndDatum(str2);
     		termin.getEndDatum();
-			tc.insertTermin(termin.getTerminName(), termin.getStartDatum(), termin.getEndDatum(), termin.getFarbe().toString());
+			tc.insertTermin(termin.getTerminName(), termin.getStartDatum(), termin.getEndDatum(), termin.getFarbe().toString(), id);
 		}
     	tc.anzahlTermin();
     }
