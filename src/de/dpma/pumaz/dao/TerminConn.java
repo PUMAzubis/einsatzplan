@@ -51,7 +51,7 @@ public class TerminConn {
 	// String dbName = "terminDB";
 	// define the Derby connection URL to use
 	private String connectionURL = "jdbc:derby:" + dbName + ";create=true";
-	private Connection conn = null;
+	private Connection conn;
 	private Statement s;
 	private PreparedStatement psInsert;
 	private ResultSet resultSet;
@@ -68,15 +68,18 @@ public class TerminConn {
 	private String insertString = "INSERT INTO " + terminTable
 			+ " (TERMINNAME, STARTDATUM, ENDDATUM, COLOR, AZUBI_FK) values (?, ?, ?, ?, ?)";
 	private String searchByString = "select * from " + terminTable + " order by TERMIN_ID";
+	private String joinString = "Select TERMIN.* from TERMIN left outer JOIN AZUBI ON AZUBI.AZUBI_ID = TERMIN.AZUBI_FK WHERE Name = (?) AND VORNAME = (?)";
+	@SuppressWarnings("unused")
 	private String deleteString = "DROP TABLE " + terminTable;
 	private String countString = "SELECT COUNT(*) FROM " + terminTable;
+	@SuppressWarnings("unused")
 	private StartApp startApp;
 
 	public Connection establishConnection() {
 		try {
 			// Create (if needed) and connect to the database.
 			// The driver is loaded automatically.
-			conn = DriverManager.getConnection(connectionURL);
+			this.conn = DriverManager.getConnection(connectionURL);
 			System.out.println("Connected to database " + dbName);
 
 			// Beginning of the primary catch block: prints stack trace
@@ -93,6 +96,7 @@ public class TerminConn {
 	}
 
 	public Connection getConnection() {
+		System.out.println("Connection sollte nicht null sein");
 		return conn;
 	}
 
@@ -129,8 +133,6 @@ public class TerminConn {
 				System.out.println(printLine);
 				while (resultSet.next()) {
 					System.out.println(
-//							"Terminname ist " + resultSet.getString(1) + " und er geht von " + resultSet.getDate(2)
-//									+ " bis " + resultSet.getDate(3) + ". Farbe ist  " + resultSet.getString(4));
 							"Terminid ist " + resultSet.getInt(1) + ". Name: " + resultSet.getString(2)
 							+ " und er geht von " + resultSet.getDate(3) + " bis"+ resultSet.getDate(4)
 							+ ". Farbe ist  " + resultSet.getString(4));
@@ -177,7 +179,6 @@ public class TerminConn {
 				System.out.println("Getting Started With Derby JDBC program ending.");
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Closed connection");
@@ -210,13 +211,18 @@ public class TerminConn {
 	 * Liest die Information eines Termins aus der Datenbank aus und gibt ihn zurück.
 	 * @return Liste, die mit Einträgen aus der Datenbank gefüllt wird.
 	 */
-	public ObservableList<Termin> getDBTermin(){
+	public ObservableList<Termin> getDBTermin(String name, String vorname){
 		ObservableList<Termin> list = FXCollections.observableArrayList();
-		list = startApp.getTerminList();
+		list = StartApp.getTerminList();
 		try {
 			s = conn.createStatement();
 			// Select all records in the TERMIN table
-			resultSet = s.executeQuery(searchByString);
+//			resultSet = s.executeQuery(searchByString);
+			psInsert = conn.prepareStatement(joinString);
+			psInsert.setString(1, name);
+			psInsert.setString(2, vorname);
+			
+			resultSet = psInsert.executeQuery();
 
 			// Loop through the ResultSet and print the data
 			while (resultSet.next()) {
@@ -228,7 +234,6 @@ public class TerminConn {
 			resultSet.close();
 			s.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return list;
@@ -248,7 +253,6 @@ public class TerminConn {
 			System.out.println("anzahlTermine " + rowCount);	
 			s.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return rowCount;

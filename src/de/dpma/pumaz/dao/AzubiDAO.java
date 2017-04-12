@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import de.dpma.pumaz.StartApp;
 import de.dpma.pumaz.model.Auszubildender;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,7 +14,8 @@ import javafx.collections.ObservableList;
 public class AzubiDAO {
 
 	// ## DEFINE VARIABLES SECTION ##
-		private Connection conn = null;
+		private StartApp sa = new StartApp();
+		private Connection conn;
 		private Statement s;
 		private PreparedStatement psInsert;
 		private ResultSet resultSet;
@@ -26,9 +28,11 @@ public class AzubiDAO {
 		private String insertString = "INSERT INTO " + mainTable
 				+ " (NAME, VORNAME, LEHRJAHR, AUSBILDUNGSBERUF) values (?, ? , ?, ?)";
 		private String searchByString = "select AZUBI_ID, NAME, VORNAME, LEHRJAHR, AUSBILDUNGSBERUF from " + mainTable + " order by AZUBI_ID";
-		private String deleteString = "DROP TABLE " + mainTable;
-		private String countString = "SELECT COUNT(*) FROM " + mainTable;
+//		private String deleteString = "DROP TABLE " + mainTable;
+//		private String countString = "SELECT COUNT(*) FROM " + mainTable;
+		private String generatedColumns[] = {"AZUBI_ID"};
 		private int id;
+		private TerminConn tc;
 		
 		/**
 		 * Fügt einen Auszubildenden die Tabelle AZUBI ein.
@@ -49,7 +53,7 @@ public class AzubiDAO {
 				}
 				
 				// Prepare the insert statement to use
-				psInsert = conn.prepareStatement(insertString);
+				psInsert = conn.prepareStatement(insertString, generatedColumns);
 
 				// Check if it is time to EXIT, if not insert the data
 				if (!azubi.getNachname().equals("") && !azubi.getVorname().equals("")) {
@@ -58,16 +62,13 @@ public class AzubiDAO {
 					psInsert.setString(2, azubi.getVorname());
 					psInsert.setInt(3, azubi.getLehrjahr());
 					psInsert.setString(4, azubi.getAusbildungsberuf());
-					System.out.println("azubi.Ausbildung " +azubi.getAusbildungsberuf() );
 					psInsert.executeUpdate();
 
 					// Select all records in the TERMIN table
-					resultSet = s.executeQuery(searchByString);
-
-					resultSet.next();
+					resultSet = psInsert.getGeneratedKeys();
+					if(resultSet.next())
 					id = resultSet.getInt(1);
-					System.out.println("ID " + id);
-					
+
 					// Loop through the ResultSet and print the data
 					System.out.println(printLine);
 					while (resultSet.next()) {
@@ -106,7 +107,7 @@ public class AzubiDAO {
 		 */
 	public boolean doesTableExist(String tablename) throws SQLException {
 		try (ResultSet resSet = conn.getMetaData().getTables(null, null, tablename, new String[]{"TABLE","VIEW"})) {
-			System.out.println("cknd" + resSet.getMetaData().getColumnName(1));
+			System.out.println("TableTyp: " + resSet.getMetaData().getColumnName(1));
 			if (resSet.next()) {
 				resSet.close();
 				return true;
@@ -130,10 +131,10 @@ public class AzubiDAO {
 		return false;
 	}
 	
-	public ObservableList<Auszubildender> getDBAzubi(){
+	public ObservableList<Auszubildender> getDBAzubi(Connection con){
 		ObservableList<Auszubildender> list = FXCollections.observableArrayList();
 		try {
-			s = conn.createStatement();
+			s = con.createStatement();
 			// Select all records in the TERMIN table
 			resultSet = s.executeQuery(searchByString);
 			// Loop through the ResultSet and print the data
@@ -145,7 +146,30 @@ public class AzubiDAO {
 			resultSet.close();
 			s.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return list;
+	}
+	
+	public ObservableList<String> getDBAzubiName(){
+		sa = sa.getSA();
+		tc = sa.getTerminConn();
+		conn = tc.establishConnection();
+		
+		ObservableList<String> list = FXCollections.observableArrayList();
+		try {
+			s = conn.createStatement();
+			// Select all records in the TERMIN table
+			resultSet = s.executeQuery(searchByString);
+			// Loop through the ResultSet and print the data
+			while (resultSet.next()) {
+				System.out.println("Name " + resultSet.getString(2));
+				String name = resultSet.getString(2) + ", " + resultSet.getString(3);
+				list.add(name);
+			}
+			resultSet.close();
+			s.close();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return list;
@@ -154,4 +178,13 @@ public class AzubiDAO {
 	public int getAzubiID(){
 		return id;
 	}
+	
+	public TerminConn getConnection(){
+		return tc;
+	}
+	
+	
+public void setStart(StartApp startApp) {
+    	sa = startApp;
+    }
 }

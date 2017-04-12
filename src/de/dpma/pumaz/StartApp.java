@@ -15,11 +15,11 @@ import javafx.stage.Stage;
 
 public class StartApp extends Application{
 
+	StartApp startApp = this;
 	private Stage primaryStage;
 	private AnchorPane rootLayout;
 	private TerminConn terminConn = new TerminConn();
-	public static RootController rootController;
-	
+	public RootController rootController;
 	private static ObservableList<Termin> terminList = FXCollections.observableArrayList();
 
 	public static void main(String[] args) {
@@ -74,7 +74,7 @@ public class StartApp extends Application{
      * Returns the data as an observable list of Termin. 
      * @return Terminliste
      */
-    public ObservableList<Termin> getTerminList() {
+    public static ObservableList<Termin> getTerminList() {
         return terminList;
     }
     
@@ -90,18 +90,18 @@ public class StartApp extends Application{
     }
     
     public StartApp getSA(){
-    	return this;
+    	return startApp;
     }
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("Einsatzplan");
-//		this.primaryStage.setResizable(false);
+		this.primaryStage.setResizable(false);
 		this.primaryStage.setMinWidth(500);
 		this.primaryStage.setMinHeight(370);
 		terminConn.establishConnection();
-		terminConn.setApp(this);
+		terminConn.setApp(startApp);
 		initRootLayout();
 	}
 	
@@ -117,7 +117,7 @@ public class StartApp extends Application{
 			rootLayout = (AnchorPane) loader.load();
 
 			rootController = loader.getController();
-			rootController.setStart(this);
+			rootController.setStart(startApp);
 			
 			//Show the scene containing the root layout.
 			Scene scene = new Scene(rootLayout);

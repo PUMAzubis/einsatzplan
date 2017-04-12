@@ -17,7 +17,7 @@
         <tabs>
           <Tab fx:id="tab" text="Daten">
             <content>
-              <AnchorPane prefHeight="311.0" prefWidth="458.0">
+              <AnchorPane>
                      <children>
                         <TextField fx:id="vornameField" layoutX="25.0" layoutY="33.0" promptText="Vorname" />
                         <ComboBox fx:id="comboboxBeruf" layoutX="25.0" layoutY="82.0" prefHeight="31.0" prefWidth="187.0" promptText="Ausbildungsberuf" />
@@ -38,7 +38,7 @@
           </Tab>
           <Tab fx:id="tab2" text="Erweitert">
             <content>
-              <AnchorPane prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane>
                      <children>
                         <ButtonBar layoutX="15.0" layoutY="235.0" prefHeight="40.0" prefWidth="394.0" AnchorPane.bottomAnchor="25.0">
                           <buttons>

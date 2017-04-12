@@ -63,6 +63,7 @@ public class RootController {
 	List<Integer> einsatzplanjahre = new ArrayList<Integer>();
 	
 	private Stage dialogStage;
+	private Stage loadStage;
     // Reference to the main application.
 	private StartApp startApp;
     private TerminEditController controller;
@@ -85,14 +86,6 @@ public class RootController {
 		comboboxEinsatzjahr.getItems().addAll(einsatzplanjahre);
 		comboboxAusbildungsjahr.getItems().addAll(ausbildungsjahre);
 		
-		tab.setOnSelectionChanged(new EventHandler<Event>() {
-			@Override
-			public void handle(Event event) {
-				if (tab2.isSelected()) {
-					startApp.getPrimaryStage().setResizable(true);
-				}
-			}
-		});
 	}
 	
     /**
@@ -134,10 +127,23 @@ public class RootController {
      * @param startApp
      */
     public void setStart(StartApp startApp) {
+    	
+    	tab2.setOnSelectionChanged(new EventHandler<Event>() {
+			@Override
+			public void handle(Event event) {
+				if (tab2.isSelected()) {
+					startApp.getPrimaryStage().setResizable(true);
+				}else{
+					startApp.getPrimaryStage().setHeight(370);
+					startApp.getPrimaryStage().setWidth(500);
+					startApp.getPrimaryStage().setResizable(false);
+				}
+			}
+		});
+    	
         this.startApp = startApp;
-
         // Add observable list data to the table
-        terminTable.setItems(startApp.getTerminList());
+        terminTable.setItems(StartApp.getTerminList());
     }
     
     /**
@@ -171,7 +177,7 @@ public class RootController {
     	
     	id = aDAO.getAzubiID();
     	
-    	for (Termin termin : startApp.getTerminList()) {
+    	for (Termin termin : StartApp.getTerminList()) {
     		String str = termin.getStartDatumName();
     		String str2 = termin.getEndDatumName();
     		termin.setStartDatum(str);
@@ -189,8 +195,28 @@ public class RootController {
 	 */
     @FXML
     private void loadTable(){
-    	TerminConn tc = startApp.getTerminConn();
-    	tc.getDBTermin();
+//    	TerminConn tc = startApp.getTerminConn();
+//    	tc.getDBTermin();
+    	try{
+    	
+    	FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("../view/LoadAzubiDialog.fxml"));
+        AnchorPane page = (AnchorPane) loader.load();
+        
+        // Create the dialog Stage.
+        loadStage = new Stage();
+        loadStage.setTitle("Neuer Eintrag");
+        loadStage.initModality(Modality.WINDOW_MODAL);
+        Scene scene = new Scene(page);
+        loadStage.setScene(scene);
+        
+        LoadAzubiController controller = loader.getController();
+        controller.setDialogStage(loadStage);
+        
+        loadStage.showAndWait();
+    	} catch(IOException e){
+    		e.printStackTrace();
+    	}
     }
 
     /**
