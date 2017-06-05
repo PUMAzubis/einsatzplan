@@ -16,35 +16,36 @@ public class Termin {
 	private ObjectProperty<LocalDate> startDatum = new SimpleObjectProperty<LocalDate>();
 	private ObjectProperty<LocalDate> endDatum = new SimpleObjectProperty<LocalDate>();
 	private ObjectProperty<Color> farbe = new SimpleObjectProperty<Color>();
-	
-	public Termin(){
-		this(null);
-	}
-	
-	public Termin(String terminName){
-		this.terminName = new SimpleObjectProperty<String>(terminName);
-		setStartDatumName(LocalDate.of(2012, 2, 21));
-		setEndDatumName(LocalDate.of(2014, 11, 1));
-		this.startDatumName = startDatumNameProperty();
-		this.endDatumName = endDatumNameProperty();
-	}
-	
-	public Termin(String terminName, LocalDate localDate1, LocalDate localdate2){
-		this.terminName = new SimpleObjectProperty<String>(terminName);
-		setStartDatumName(localDate1);
-		this.startDatumName = startDatumNameProperty();
-		setEndDatumName(localdate2);
-		this.endDatumName = endDatumNameProperty();
-	}
-	
+
+	/**
+	 * Konstruktor zum Erstellen eines Termins bevor er in die Datenbank gespeichert wird.
+	 * @param terminName
+	 * @param localDate1
+	 * @param localdate2
+	 * @param color
+	 */
 	public Termin(String terminName, LocalDate localDate1, LocalDate localdate2, Color color){
-		this.terminName = new SimpleObjectProperty<String>(terminName);
+		setTerminName(terminName);
 		setStartDatumName(localDate1);
-		this.startDatumName = startDatumNameProperty();
 		setEndDatumName(localdate2);
-		this.endDatumName = endDatumNameProperty();
 		setFarbe(color);
-		this.farbe = colorProperty();
+	}
+	
+	/**
+	 * Konstruktor zum Erstellen eines Termin, nach dem Laden aus der Datenbank.
+	 * @param terminName
+	 * @param localDate1
+	 * @param localdate2
+	 * @param color
+	 * @param id - Wird aus der Datenbank von TERMIN_ID übergeben, um den Termin in der Datenbank
+	 * einwandfrei zu identifizieren.
+	 */
+	public Termin(String terminName, LocalDate localDate1, LocalDate localdate2, Color color, int id){
+		setTerminName(terminName);
+		setStartDatumName(localDate1);
+		setEndDatumName(localdate2);
+		setFarbe(color);
+		setTermin_id(id);
 	}
 
 	/***************************************************************************************
@@ -137,11 +138,14 @@ public class Termin {
 		this.farbe.set(farbe);
 	}
 
+	/**
+	 * 
+	 */
 	public int getTermin_id() {
 		return termin_id;
 	}
 
-	public void setTermin_id(int termin_id) {
+	public void setTermin_id(int termin_id){
 		this.termin_id = termin_id;
 	}
     

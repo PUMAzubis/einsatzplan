@@ -28,7 +28,6 @@ package de.dpma.pumaz.dao;
 //  Include the java SQL classes 
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -41,66 +40,25 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 
-public class TerminConn {
+public class TerminDAO {
 
 	// ## DEFINE VARIABLES SECTION ##
 	// define the driver to use
-	private String driver = "org.apache.derby.jdbc.EmbeddedDriver";
-	// the database name
-	private String dbName = "constraintDB2";
-	// String dbName = "terminDB";
-	// define the Derby connection URL to use
-	private String connectionURL = "jdbc:derby:" + dbName + ";create=true";
-	private Connection conn;
+	
 	private Statement s;
 	private PreparedStatement psInsert;
 	private ResultSet resultSet;
 	private String terminTable = "TERMIN";
-	private String printLine = "  __________________________________________________";
-//	private String createString = "CREATE TABLE " + terminTable
-//			+ " (TERMIN_ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)"
-//			+ "   CONSTRAINT Termin_PK PRIMARY KEY, "
-//			+ " TERMINNAME VARCHAR(32) NOT NULL, STARTDATUM DATE, ENDDATUM DATE, COLOR VARCHAR(255)) ";
-	private String createString = "CREATE TABLE " + terminTable
-			+ " (TERMIN_ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)"
-			+ "   CONSTRAINT Termin_PK PRIMARY KEY, "
-			+ " TERMINNAME VARCHAR(32) NOT NULL, STARTDATUM DATE, ENDDATUM DATE, COLOR VARCHAR(255), AZUBI_FK INTEGER, CONSTRAINT AZUBI_FK FOREIGN KEY(AZUBI_FK) REFERENCES APP.AZUBI(AZUBI_ID)) ";
-	private String insertString = "INSERT INTO " + terminTable
-			+ " (TERMINNAME, STARTDATUM, ENDDATUM, COLOR, AZUBI_FK) values (?, ?, ?, ?, ?)";
-	private String searchByString = "select * from " + terminTable + " order by TERMIN_ID";
-	private String joinString = "Select TERMIN.* from TERMIN left outer JOIN AZUBI ON AZUBI.AZUBI_ID = TERMIN.AZUBI_FK WHERE Name = (?) AND VORNAME = (?)";
-	@SuppressWarnings("unused")
-	private String deleteString = "DROP TABLE " + terminTable;
-	private String countString = "SELECT COUNT(*) FROM " + terminTable;
-	@SuppressWarnings("unused")
-	private StartApp startApp;
 
-	public Connection establishConnection() {
-		try {
-			// Create (if needed) and connect to the database.
-			// The driver is loaded automatically.
-			this.conn = DriverManager.getConnection(connectionURL);
-			System.out.println("Connected to database " + dbName);
-
-			// Beginning of the primary catch block: prints stack trace
-		} catch (Throwable e) {
-			/*
-			 * Catch all exceptions and pass them to the
-			 * Throwable.printStackTrace method
-			 */
-			System.out.println(" . . . exception thrown:");
-			e.printStackTrace(System.out);
-		} // ## DATABASE SHUTDOWN SECTION ##
-
-		return conn;
-	}
-
-	public Connection getConnection() {
-		System.out.println("Connection sollte nicht null sein");
-		return conn;
-	}
-
-	public void insertTermin(String terminname, LocalDate localD, LocalDate localD2, String color, int id) {
+	public void insertTermin(String terminname, LocalDate localD, LocalDate localD2, String color, int id, Connection conn) {
+		String createString = "CREATE TABLE " + terminTable
+				+ " (TERMIN_ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)"
+				+ "   CONSTRAINT Termin_PK PRIMARY KEY, "
+				+ " TERMINNAME VARCHAR(32) NOT NULL, STARTDATUM DATE, ENDDATUM DATE, COLOR VARCHAR(255), AZUBI_FK INTEGER, CONSTRAINT AZUBI_FK FOREIGN KEY(AZUBI_FK) REFERENCES APP.AZUBI(AZUBI_ID)) ";
+		String insertString = "INSERT INTO " + terminTable
+				+ " (TERMINNAME, STARTDATUM, ENDDATUM, COLOR, AZUBI_FK) values (?, ?, ?, ?, ?)";
+		String searchByString = "select * from " + terminTable + " order by TERMIN_ID";
+		String printLine = "  __________________________________________________";
 		Date dateStart = Date.valueOf(localD);
 		Date dateEnd = Date.valueOf(localD2);
 		// JDBC code sections
@@ -109,7 +67,7 @@ public class TerminConn {
 		try {
 			s = conn.createStatement();
 			// Call utility method to check if table exists.
-			if (!doesTableExist(terminTable)) { // soll false sein
+			if (!doesTableExist(terminTable, conn)) { // soll false sein
 				System.out.println("TABELLE WIRD ANGELEGT");
 				psInsert = conn.prepareStatement(createString);
 				psInsert.execute();
@@ -158,39 +116,51 @@ public class TerminConn {
 		 * throws the XJ015 exception to confirm success.
 		 ***/
 	}
-
-	public void closeConnection(Connection conn) {
+	
+	public void updateTermin(Termin termin, Connection conn){
+		String updateString= "UPDATE " + terminTable + " SET STARTDATUM = (?), ENDDATUM = (?), COLOR = (?) WHERE TERMIN_ID = (?)";
+		Date date = Date.valueOf(termin.getStartDatum());
+		Date date2 = Date.valueOf(termin.getEndDatum());
+		String color = termin.getFarbe().toString();
 		try {
-			conn.close();
-			if (driver.equals("org.apache.derby.jdbc.EmbeddedDriver")) {
-				boolean gotSQLExc = false;
-				try {
-					DriverManager.getConnection("jdbc:derby:;shutdown=true");
-				} catch (SQLException se) {
-					if (se.getSQLState().equals("XJ015")) {
-						gotSQLExc = true;
-					}
-				}
-				if (!gotSQLExc) {
-					System.out.println("Database did not shut down normally");
-				} else {
-					System.out.println("Database shut down normally");
-				}
-				System.out.println("Getting Started With Derby JDBC program ending.");
-			}
+			psInsert = conn.prepareStatement(updateString);
+			
+			psInsert.setDate(1, date);
+			psInsert.setDate(2, date2);
+			psInsert.setString(3, color);
+			psInsert.setInt(4, termin.getTermin_id());
+			psInsert.executeUpdate();
+			
+			psInsert.close();
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Closed connection");
+	}
+	
+	public void deleteTermin(int id, Connection conn){
+		String deleteString = "DELETE from " + terminTable + " WHERE TERMIN_ID = (?)";
+		try {
+			psInsert = conn.prepareStatement(deleteString);
+			
+			psInsert.setInt(1, id);
+			psInsert.executeUpdate();
+			
+			psInsert.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
-	 * Überprüft, ob eine Tabelle bereits existiert, falls nicht, legt er sie an und gibt einen boolean zurück.
+	 * Überprüft, ob eine Tabelle bereits existiert, und gibt true zurück, wenn dem so ist.
 	 * @param tablename
+	 * @param conn - die Verbindung auf der die Operationen durchgeführt werden.
 	 * @return boolean, true, wenn die Tabelle existiert. Sonst false.
 	 * @throws SQLException
 	 */
-	public boolean doesTableExist(String tablename) throws SQLException {
+	public boolean doesTableExist(String tablename, Connection conn) throws SQLException {
 		try (ResultSet resSet = conn.getMetaData().getTables(null, null, tablename, new String[]{"TABLE", "VIEW"})) {
 			if (resSet.next()) {
 				resSet.close();
@@ -211,7 +181,8 @@ public class TerminConn {
 	 * Liest die Information eines Termins aus der Datenbank aus und gibt ihn zurück.
 	 * @return Liste, die mit Einträgen aus der Datenbank gefüllt wird.
 	 */
-	public ObservableList<Termin> getDBTermin(String name, String vorname){
+	public ObservableList<Termin> getDBTermin(String name, String vorname, Connection conn){
+		String joinString = "Select TERMIN.* from TERMIN left outer JOIN AZUBI ON AZUBI.AZUBI_ID = TERMIN.AZUBI_FK WHERE Name = (?) AND VORNAME = (?)";
 		ObservableList<Termin> list = FXCollections.observableArrayList();
 		list = StartApp.getTerminList();
 		try {
@@ -228,7 +199,7 @@ public class TerminConn {
 			while (resultSet.next()) {
 				String s = resultSet.getString(5);
 				Color color = Color.web(s);
-				Termin termin = new Termin(resultSet.getString(2),resultSet.getDate(3).toLocalDate(), resultSet.getDate(4).toLocalDate(),  color); 
+				Termin termin = new Termin(resultSet.getString(2),resultSet.getDate(3).toLocalDate(), resultSet.getDate(4).toLocalDate(),  color, resultSet.getInt(1)); 
 				StartApp.addTermin(termin);
 			}
 			resultSet.close();
@@ -239,11 +210,39 @@ public class TerminConn {
 		return list;
 	}
 	
+	public int getTerminID(Termin termin, Connection conn)
+	{
+		String IDString = "Select TERMIN_ID from " + terminTable + " WHERE TERMINNAME = (?) AND STARTDATUM = (?) AND ENDDATUM = (?) AND COLOR = (?)";
+		Date ld = Date.valueOf(termin.getStartDatum());
+		Date ld2 = Date.valueOf(termin.getEndDatum());
+		String color = termin.getFarbe().toString();
+		int id = 0;
+		try {
+			psInsert = conn.prepareStatement(IDString);
+			psInsert.setString(1, termin.getTerminName());
+			psInsert.setDate(2, ld);
+			psInsert.setDate(3, ld2);
+			psInsert.setString(4, color);
+			
+			resultSet = psInsert.executeQuery();
+			
+			if(resultSet.next()){
+				id = resultSet.getInt(1);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return id;
+	}
+	
 	/**
 	 * Überprüft wie viele Termine in der Tabelle stehen.
 	 * @return anzahl der Termine
 	 */
-	public int anzahlTermin(){
+	public int anzahlTermin(Connection conn){
+		String countString = "SELECT COUNT(*) FROM " + terminTable;
 		int rowCount = 0;
 		try {
 			s = conn.createStatement();
@@ -258,7 +257,4 @@ public class TerminConn {
 		return rowCount;
 	}
 	
-	public void setApp(StartApp startApp){
-		this.startApp = startApp;
-	}
 }

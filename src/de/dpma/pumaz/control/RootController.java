@@ -1,6 +1,7 @@
 package de.dpma.pumaz.control;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,9 +9,10 @@ import java.util.List;
 
 import de.dpma.pumaz.StartApp;
 import de.dpma.pumaz.dao.AzubiDAO;
-import de.dpma.pumaz.dao.TerminConn;
+import de.dpma.pumaz.dao.TerminDAO;
 import de.dpma.pumaz.model.Auszubildender;
 import de.dpma.pumaz.model.Termin;
+import de.dpma.pumaz.util.DataBaseConnection;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -58,44 +60,29 @@ public class RootController {
 	@FXML
 	private Tab tab2;
 	
-	List<String> ausbildungsberuf = Arrays.asList("Fachinformatiker", "INKA", "VFA", "KFB", "FAMI", "Schreiner", "Elektroniker");
-	List<Integer> ausbildungsjahre = Arrays.asList(1, 2, 3, 4);
-	List<Integer> einsatzplanjahre = new ArrayList<Integer>();
-	
-	private Stage dialogStage;
-	private Stage loadStage;
+	private boolean edited = false;
     // Reference to the main application.
 	private StartApp startApp;
-    private TerminEditController controller;
 	
     /**
-     * Initialisiert die Controller-Klasse. This method is automatically called
-     * after the fxml file has been loaded.
+     * Initialisiert die Dropdown-Felder, welche für die Erstellung eines Auszubildenden nötig sind.
      */
 	@FXML
 	public void initialize(){
-		  // Initialize the person table with the two columns.
+		List<String> ausbildungsberuf = Arrays.asList("Fachinformatiker", "INKA", "VFA", "KFB", "FAMI", "Schreiner", "Elektroniker");
+		List<Integer> ausbildungsjahre = Arrays.asList(1, 2, 3, 4);
+		
+		// Initialize the person table with the two columns.
 		terminTable.setVisible(true);
         terminNameColumn.setCellValueFactory(cellData -> cellData.getValue().terminNameProperty());
         terminVonColumn.setCellValueFactory(cellData -> cellData.getValue().startDatumNameProperty());
         terminBisColumn.setCellValueFactory(cellData -> cellData.getValue().endDatumNameProperty());
         colorColumn.setCellValueFactory(cellData -> cellData.getValue().colorProperty());
         
-		setEinsatzjahre();
 		comboboxBeruf.getItems().addAll(ausbildungsberuf);
-		comboboxEinsatzjahr.getItems().addAll(einsatzplanjahre);
+		comboboxEinsatzjahr.getItems().addAll(einsatzjahrList());
 		comboboxAusbildungsjahr.getItems().addAll(ausbildungsjahre);
-		
 	}
-	
-    /**
-     * Sets the stage of this dialog.
-     * 
-     * @param dialogStage
-     */
-    public void setDialogStage(Stage dialogStage) {
-        this.dialogStage = dialogStage;
-    }
     
     /**
      * Soll den Index zurückgeben, um eine Überwachung des Bearbeitungsfensters zu gewährleisten.
@@ -108,7 +95,8 @@ public class RootController {
     /**
      * Setzt die Einsatzplanjahre in die Combobox. Immer -5 bis +5 Jahre des heutigen Jahres.
      */
-	private void setEinsatzjahre(){
+	private List<Integer> einsatzjahrList(){
+		List<Integer> einsatzplanjahre = new ArrayList<Integer>();
 		int i, j = 0, k = -5;
 		for(i = (LocalDate.now().minusYears(5).getYear()); i < LocalDate.now().plusYears(5).getYear(); i++, j++, k++){
 			if((LocalDate.now().minusYears(5).getYear()) < LocalDate.now().getYear() ){
@@ -119,6 +107,7 @@ public class RootController {
 				einsatzplanjahre.add(j, LocalDate.now().getYear());
 			}
 		}
+		return einsatzplanjahre;
 	}
 	
     /**
@@ -147,7 +136,8 @@ public class RootController {
     }
     
     /**
-     * Gibt einen Auszubildenden zum Speichern für die Datenbank zurück.
+     * Gibt einen Auszubildenden zum Speichern für die Datenbank zurück, wobei die einzelnen Werte hierbei 
+     * auf der ersten Seite erstellt wurden.
      * @return Auszubildenden
      */
     private Auszubildender getAzubi(){
@@ -159,34 +149,52 @@ public class RootController {
     	if(!name.equals("") && !vorname.equals("")){
     		azubi = new Auszubildender(name, vorname, ausbildungsJahr, beruf);
     	}
+    	else{
+    		Alert alert = new Alert(AlertType.WARNING);
+			alert.setHeaderText("Kein Auszubildender ausgewählt");
+			alert.setContentText("Bitte geben Sie Informationen zu einem Auszubildenden an!");
+			alert.showAndWait();
+    	}
     	return azubi;
     }
     
     /**
-     * Speichert die Einträge der Tabelle in der Datenbank.
+     * Speichert die Einträge der Termin-Tabelle und den entsprechenden Auszubildenden in der Datenbank.
      */
     @FXML
     private void saveTable(){
-    	TerminConn tc = startApp.getTerminConn();
+    	DataBaseConnection dbc = new DataBaseConnection();
+		Connection conn = dbc.establishConnection();
+		TerminDAO tc = new TerminDAO();
     	AzubiDAO aDAO = new AzubiDAO();
-    	int id;
+    	int azubi_id = 0;
     	
-    	if(getAzubi() != null){
-    		aDAO.insertAzubi(getAzubi(), tc.getConnection());
+    	if(getAzubi() != null && edited == false){
+    		aDAO.insertAzubi(getAzubi(), conn);
+    		azubi_id = aDAO.getAzubiID();
     	}
-    	
-    	id = aDAO.getAzubiID();
     	
     	for (Termin termin : StartApp.getTerminList()) {
     		String str = termin.getStartDatumName();
     		String str2 = termin.getEndDatumName();
+    		
     		termin.setStartDatum(str);
     		termin.getStartDatum();
     		termin.setEndDatum(str2);
     		termin.getEndDatum();
-			tc.insertTermin(termin.getTerminName(), termin.getStartDatum(), termin.getEndDatum(), termin.getFarbe().toString(), id);
+    		
+    		if(edited == false){
+    			tc.insertTermin(termin.getTerminName(), termin.getStartDatum(), termin.getEndDatum(), termin.getFarbe().toString(), azubi_id, conn);
+    		}else{
+    			if(termin.getTermin_id() != 0)
+    			tc.updateTermin(termin, conn);
+    			else
+    			tc.insertTermin(termin.getTerminName(), termin.getStartDatum(), termin.getEndDatum(), termin.getFarbe().toString(), azubi_id, conn);
+    		}
 		}
-    	tc.anzahlTermin();
+    	setEdited(false);
+    	tc.anzahlTermin(conn);
+    	dbc.closeConnection(conn);
     }
     
 	/**
@@ -195,8 +203,7 @@ public class RootController {
 	 */
     @FXML
     private void loadTable(){
-//    	TerminConn tc = startApp.getTerminConn();
-//    	tc.getDBTermin();
+    	Stage loadStage;
     	try{
     	
     	FXMLLoader loader = new FXMLLoader();
@@ -212,6 +219,12 @@ public class RootController {
         
         LoadAzubiController controller = loader.getController();
         controller.setDialogStage(loadStage);
+        controller.setRoot(this);
+        
+        terminTable.getItems().clear();
+        nameField.clear();
+        vornameField.clear();
+        comboboxAusbildungsjahr.getSelectionModel().clearSelection();
         
         loadStage.showAndWait();
     	} catch(IOException e){
@@ -224,6 +237,7 @@ public class RootController {
      */
 	@FXML
 	private void handleNewEntry(){
+		Stage dialogStage;
 		try {
 	        // Load the fxml file and create a new stage for the popup dialog.
 	        FXMLLoader loader = new FXMLLoader();
@@ -252,6 +266,8 @@ public class RootController {
 	 */
 	@FXML
 	private void handleEditTermin(){
+		Stage dialogStage;
+		
 		Termin termin = terminTable.getSelectionModel().getSelectedItem();
 		int index = getIndex();
 		if(index == -1){
@@ -271,9 +287,12 @@ public class RootController {
 		        dialogStage.setTitle("Eintrag bearbeiten");
 		        dialogStage.initModality(Modality.WINDOW_MODAL);
 		        
-		        controller = loader.getController();
+		        TerminEditController controller = loader.getController();
+		        
 		        controller.setEntries(index, termin);
 		        controller.setDialogStage(dialogStage);
+		        controller.setRoot(this);
+		        controller.setTermin_ID(termin.getTermin_id());
 		        
 		        Scene scene = new Scene(root);
 		        dialogStage.setScene(scene);
@@ -305,8 +324,26 @@ public class RootController {
      */
     @FXML
     private void handleExit() {
-    	TerminConn tc = startApp.getTerminConn();
-    	tc.closeConnection(tc.getConnection());
         System.exit(0);
+    }
+    
+    /**
+     * Setzt die Informationen eines Auszubildenden in die freien Felder hinein, nachdem man in {@link LoadAzubiController}
+     * den Bestätigen-Knopf gedrückt hat.
+     * @param azubi
+     */
+    public void setAzubiInfo(Auszubildender azubi){
+    	nameField.setText(azubi.getNachname());
+    	vornameField.setText(azubi.getVorname());
+    	comboboxBeruf.setValue(azubi.getAusbildungsberuf());
+    	comboboxAusbildungsjahr.setValue(azubi.getLehrjahr());
+    }
+    
+    public void setEdited(boolean edit){
+    	edited = edit;
+    }
+    
+    public boolean isEdited(){
+    	return edited;
     }
 }

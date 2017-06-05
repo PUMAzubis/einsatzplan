@@ -8,13 +8,42 @@ import javafx.beans.property.StringProperty;
 
 public class Auszubildender {
 
+	private int id = 0;
 	private StringProperty vorname = new SimpleStringProperty();
     private StringProperty nachname = new SimpleStringProperty();
     private int lehrjahr = 0;
     private StringProperty ausbildungsberuf = new SimpleStringProperty();
     private ObjectProperty<LocalDate> einsatzplanjahr = null;
     
+    /**
+     * Konstruktor zum Erstellen eines Auszubildenden vor dem Einfügen in die Datenbank.
+     * @param name
+     * @param vorname
+     * @param lehrjahr
+     * @param ausbildungsberuf
+     */
     public Auszubildender(String name, String vorname, int lehrjahr, String ausbildungsberuf){
+    	setFirstName(vorname);
+    	this.vorname = vornameProperty();
+    	setNachname(name);
+    	this.nachname = nachnameProperty();
+    	setLehrjahr(lehrjahr);
+    	this.lehrjahr = getLehrjahr();
+    	setAusbildungsberuf(ausbildungsberuf);
+    	this.ausbildungsberuf = ausbildungsBerufProperty();
+    }
+    
+    /**
+     * Konstruktor zum Erstellen eines Auszubildenden, der aus der Datenbank herausgeholt wurde.
+     * @param id - Ist die AZUBI_ID aus der Datenbank, welche mit Autoincrement erstellt wurde, um den Auszubildenden
+     * einwandfrei zu identifizieren.
+     * @param name
+     * @param vorname
+     * @param lehrjahr
+     * @param ausbildungsberuf
+     */
+    public Auszubildender(int id, String name, String vorname, int lehrjahr, String ausbildungsberuf){
+    	setAzubiId(id);
     	setFirstName(vorname);
     	this.vorname = vornameProperty();
     	setNachname(name);
@@ -79,6 +108,14 @@ public class Auszubildender {
 	
 	public String getAusbildungsberuf(){
 		return ausbildungsberuf.get();
+	}
+	
+	public void setAzubiId(int id){
+		this.id = id;
+	}
+	
+	public int getAzubiId(){
+		return id;
 	}
     
     
