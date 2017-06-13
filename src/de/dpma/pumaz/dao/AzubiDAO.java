@@ -29,9 +29,9 @@ public class AzubiDAO {
 		String createString = "CREATE TABLE " + azubiTable
 				+ " (AZUBI_ID INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)"
 				+ "   CONSTRAINT AZUBI_PK PRIMARY KEY, "
-				+ " NAME VARCHAR(32) NOT NULL, VORNAME VARCHAR(32) NOT NULL, LEHRJAHR INT, AUSBILDUNGSBERUF VARCHAR(255) NOT NULL) ";
+				+ " NAME VARCHAR(32) NOT NULL, VORNAME VARCHAR(32) NOT NULL, LEHRJAHR INT, AUSBILDUNGSBERUF VARCHAR(255) NOT NULL, EINSATZJAHR INT) ";
 		String insertString = "INSERT INTO " + azubiTable
-				+ " (NAME, VORNAME, LEHRJAHR, AUSBILDUNGSBERUF) values (?, ? , ?, ?)";
+				+ " (NAME, VORNAME, LEHRJAHR, AUSBILDUNGSBERUF, EINSATZJAHR) values (?, ? , ?, ?, ?)";
 		String printLine = "  __________________________________________________";
 		String generatedColumns[] = { "AZUBI_ID" };
 		// JDBC code sections
@@ -55,6 +55,7 @@ public class AzubiDAO {
 				psInsert.setString(2, azubi.getVorname());
 				psInsert.setInt(3, azubi.getLehrjahr());
 				psInsert.setString(4, azubi.getAusbildungsberuf());
+				psInsert.setInt(5, azubi.getEinsatzplanjahr());
 				psInsert.executeUpdate();
 
 				// Select all records in the TERMIN table
@@ -118,7 +119,7 @@ public class AzubiDAO {
 	}
 
 	public ObservableList<Auszubildender> getDBAzubi(Connection con) {
-		String searchByString = "select AZUBI_ID, NAME, VORNAME, AUSBILDUNGSBERUF, LEHRJAHR from " + azubiTable
+		String searchByString = "select AZUBI_ID, NAME, VORNAME, AUSBILDUNGSBERUF, LEHRJAHR, EINSATZJAHR from " + azubiTable
 				+ " order by AZUBI_ID";
 		ObservableList<Auszubildender> list = FXCollections.observableArrayList();
 		try {
@@ -127,8 +128,8 @@ public class AzubiDAO {
 			resultSet = s.executeQuery(searchByString);
 			// Loop through the ResultSet and print the data
 			while (resultSet.next()) {
-				Auszubildender azubi = new Auszubildender(resultSet.getString(2), resultSet.getString(3),
-						resultSet.getInt(5), resultSet.getString(4));
+				Auszubildender azubi = new Auszubildender(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
+						resultSet.getInt(5), resultSet.getString(4), resultSet.getInt(6));
 				list.add(azubi);
 			}
 			resultSet.close();
@@ -150,7 +151,6 @@ public class AzubiDAO {
 			resultSet = s.executeQuery(searchByString);
 			// Loop through the ResultSet and print the data
 			while (resultSet.next()) {
-//				System.out.println("Name " + resultSet.getString(2));
 				String name = resultSet.getString(2) + ", " + resultSet.getString(3) + ", " + resultSet.getString(4)+ ", "+ resultSet.getInt(5) + ". Lehrjahr.";
 				list.add(name);
 			}
@@ -163,7 +163,7 @@ public class AzubiDAO {
 	}
 	
 	public Auszubildender getAzubiInfo(int id, Connection conn){
-		String azubiString = "select AZUBI_ID, NAME, VORNAME, LEHRJAHR, AUSBILDUNGSBERUF from " + azubiTable
+		String azubiString = "select AZUBI_ID, NAME, VORNAME, LEHRJAHR, AUSBILDUNGSBERUF, EINSATZJAHR from " + azubiTable
 				+ " where AZUBI_ID = (?)";
 		Auszubildender azubi = null;
 		try {
@@ -173,7 +173,7 @@ public class AzubiDAO {
 			resultSet = psInsert.executeQuery();
 			
 			if(resultSet.next()){
-				azubi = new Auszubildender(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getString(5));
+				azubi = new Auszubildender(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getString(5), resultSet.getInt(6));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

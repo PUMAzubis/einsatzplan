@@ -146,8 +146,9 @@ public class RootController {
     	String vorname = vornameField.getText();
     	Integer ausbildungsJahr = comboboxAusbildungsjahr.getValue();
     	String beruf = comboboxBeruf.getValue();
+    	Integer einsatzjahr = comboboxEinsatzjahr.getValue();
     	if(!name.equals("") && !vorname.equals("")){
-    		azubi = new Auszubildender(name, vorname, ausbildungsJahr, beruf);
+    		azubi = new Auszubildender(name, vorname, ausbildungsJahr, beruf, einsatzjahr);
     	}
     	else{
     		Alert alert = new Alert(AlertType.WARNING);
@@ -191,10 +192,11 @@ public class RootController {
     			else
     			tc.insertTermin(termin.getTerminName(), termin.getStartDatum(), termin.getEndDatum(), termin.getFarbe().toString(), azubi_id, conn);
     		}
+    		
 		}
-    	setEdited(false);
     	tc.anzahlTermin(conn);
     	dbc.closeConnection(conn);
+    	setEdited(false);
     }
     
 	/**
@@ -337,6 +339,7 @@ public class RootController {
     	vornameField.setText(azubi.getVorname());
     	comboboxBeruf.setValue(azubi.getAusbildungsberuf());
     	comboboxAusbildungsjahr.setValue(azubi.getLehrjahr());
+    	comboboxEinsatzjahr.setValue(azubi.getEinsatzplanjahr());
     }
     
     public void setEdited(boolean edit){

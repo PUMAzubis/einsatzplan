@@ -19,7 +19,7 @@ public class StartApp extends Application{
 	private AnchorPane rootLayout;
 	public RootController rootController;
 	private static ObservableList<Termin> terminList = FXCollections.observableArrayList();
-
+	
 	public static void main(String[] args) {
 		launch(args);
 	}

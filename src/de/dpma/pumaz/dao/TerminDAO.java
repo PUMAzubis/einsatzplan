@@ -155,6 +155,7 @@ public class TerminDAO {
 
 	/**
 	 * Überprüft, ob eine Tabelle bereits existiert, und gibt true zurück, wenn dem so ist.
+	 * 
 	 * @param tablename
 	 * @param conn - die Verbindung auf der die Operationen durchgeführt werden.
 	 * @return boolean, true, wenn die Tabelle existiert. Sonst false.
@@ -179,6 +180,7 @@ public class TerminDAO {
 	
 	/**
 	 * Liest die Information eines Termins aus der Datenbank aus und gibt ihn zurück.
+	 * 
 	 * @return Liste, die mit Einträgen aus der Datenbank gefüllt wird.
 	 */
 	public ObservableList<Termin> getDBTermin(String name, String vorname, Connection conn){
@@ -239,6 +241,7 @@ public class TerminDAO {
 	
 	/**
 	 * Überprüft wie viele Termine in der Tabelle stehen.
+	 * 
 	 * @return anzahl der Termine
 	 */
 	public int anzahlTermin(Connection conn){
